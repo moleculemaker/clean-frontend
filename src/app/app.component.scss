@@ -60,6 +60,30 @@ header {
         flex-grow: 1;
     }
 
+    .login_button, .logout_button {
+      cursor: pointer;
+
+      color: css_var('button_secondary');
+
+      padding: ($padding * .25) ($padding * .5);
+
+      font: {
+        size: .75rem;
+      }
+      text: {
+        transform: uppercase;
+      }
+
+      @include border-radius($border_radius);
+
+      &:hover {
+        color: css_var('background');
+        background: {
+          color: css_var('button_secondary');
+        }
+      }
+    }
+
     .coming_soon {
         position: relative;
 
@@ -69,7 +93,7 @@ header {
             }
         }
 
-        .coming_soon_button {
+        .coming_soon_button,  {
             cursor: pointer;
 
             color: css_var('button_secondary');
@@ -327,9 +351,9 @@ cite {
         .bolded {
             font-weight: bold;
             color: #224063;
-            
+
         }
     }
 
-    
+
 }

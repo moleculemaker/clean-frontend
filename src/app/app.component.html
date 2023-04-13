@@ -28,6 +28,10 @@
 
     <div class="spacer"></div>
 
+    <div class="logout_button" *ngIf="userInfo" (click)="logout()">Logout</div>
+
+    <div class="login_button" *ngIf="!userInfo" (click)="login()">Login</div>
+
     <div class="coming_soon"
         [class.show_popup]="showComingSoonPopup"
     >
