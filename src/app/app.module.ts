@@ -16,6 +16,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { FileUploadModule } from 'primeng/fileupload';
 import { MessagesModule } from 'primeng/messages';
+import { CheckboxModule } from 'primeng/checkbox';
 
 
 import { LandingPageComponent} from './components/landing-page/landing-page.component';
@@ -55,6 +56,7 @@ import { NgHcaptchaModule } from 'ng-hcaptcha';
     PanelModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    CheckboxModule,
     NgxMatomoTrackerModule.forRoot({
       siteId: 3,
       trackerUrl: 'https://matomo.mmli1.ncsa.illinois.edu/'

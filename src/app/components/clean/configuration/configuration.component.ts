@@ -16,7 +16,6 @@ import {NgHcaptchaService} from "ng-hcaptcha";
   styleUrls: ['./configuration.component.scss']
 })
 export class ConfigurationComponent {
-  // sequenceData: string = '>seq1\nAVLIMCFYWH\n>seq2\nLIMCFYWHKRQNED\n>seq3\nMCFYPARQNEDVLWHKRQ';
   sequenceData: string = '';
   validationText: string = '';
   isValid: boolean = false;
@@ -28,6 +27,7 @@ export class ConfigurationComponent {
   private maxSeqNum: number = 20;
   disableCopyPaste: boolean = false;
   highTrafficMessage: Message[];
+  checked: boolean;
 
   inputMethods = [
     { label: 'Copy and Paste', icon: 'pi pi-copy', value: 'copy_and_paste' },
@@ -35,11 +35,19 @@ export class ConfigurationComponent {
   ];
   selectedInputMethod: any | null = 'copy_and_paste'; //this.inputMethods[0];
 
+  fileFormat = [
+    { label: 'Amino Acid Sequences', icon: 'pi pi-copy', value: 'amino' },
+    { label: 'DNA Sequences', icon: 'pi pi-copy', value: 'dna' },
+    { label: 'NCBI ascension', icon: 'pi pi-copy', value: 'ncbi' },
+  ]
+  selectedfileFormat: any | null = 'amino';
+
   exampleData: ExampleData[] = [];
   selectedExample: any | null = this.exampleData[0];
 
   seqNum: number = 0;
   private validAminoAcid = new RegExp("[^GPAVLIMCFYWHKRQNEDST]", "i");
+  private validDNA = new RegExp("[^ACTG]", "i");
   realSendData: PostSeqData = {
     input_fasta: [],
     user_email: '',
@@ -124,11 +132,18 @@ export class ConfigurationComponent {
   }
 
   isInvalidFasta(seq: string) {
-    return this.validAminoAcid.test(seq);
+    if (this.selectedfileFormat == 'amino') {
+      return this.validAminoAcid.test(seq);
+    }
+    return this.validDNA.test(seq);
   }
 
   enterEmail() {
     this.realSendData.user_email = this.userEmail;
+  }
+
+  submitValidateNCBI() {
+
   }
 
   submitValidate() {
