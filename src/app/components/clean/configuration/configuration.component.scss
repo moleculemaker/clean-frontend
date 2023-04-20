@@ -80,6 +80,18 @@
     .spacer {
         flex-grow: 1;
     }
+
+    .buttons {
+        // border: 1px solid #224063;
+        display: flex;
+        align-items: center;
+        .label {
+            padding: 0.5rem;
+            // border: 1px solid #224063;
+        }
+    }
+
+    
 }
 
 .validation {

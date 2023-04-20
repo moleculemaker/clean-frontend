@@ -38,7 +38,7 @@ export class ConfigurationComponent {
   fileFormat = [
     { label: 'Amino Acid Sequences', icon: 'pi pi-copy', value: 'amino' },
     { label: 'DNA Sequences', icon: 'pi pi-copy', value: 'dna' },
-    { label: 'NCBI ascension', icon: 'pi pi-copy', value: 'ncbi' },
+    { label: 'NCBI ascension number', icon: 'pi pi-copy', value: 'ncbi' },
   ]
   selectedfileFormat: any | null = 'amino';
 
@@ -101,7 +101,7 @@ export class ConfigurationComponent {
   }
 
   submitData() {
-    // console.log(this.realSendData);
+    console.log(this.realSendData);
     // if the user uses example file, return precompiled result
     // else send sequence to backend, jump to results page
     if (this.selectedInputMethod == 'use_example') {
@@ -135,7 +135,10 @@ export class ConfigurationComponent {
     if (this.selectedfileFormat == 'amino') {
       return this.validAminoAcid.test(seq);
     }
-    return this.validDNA.test(seq);
+    else if (this.selectedfileFormat == 'dna'){
+      return this.validDNA.test(seq);
+    }
+    return true;
   }
 
   enterEmail() {
@@ -178,7 +181,8 @@ export class ConfigurationComponent {
     splitString.forEach((seq: string) => {
       let singleSeq: SingleSeqData = {
         header: '',
-        sequence: ''
+        sequence: '',
+        DNA_sequence: ''
       };
       this.seqNum += 1;
       let aminoHeader: string = seq.split('\n')[0];
@@ -204,11 +208,6 @@ export class ConfigurationComponent {
         return
       }
 
-      headers.push(aminoHeader);
-      singleSeq.header = aminoHeader;
-      singleSeq.sequence = aminoSeq;
-      this.realSendData.input_fasta.push(singleSeq);
-
       if (this.isInvalidFasta(aminoSeq)) {
         this.validationText = 'Invalid sequence: ' + warningMessageHeader + ', This is not a valid fasta file format!';
         this.isValid = false;
@@ -229,6 +228,18 @@ export class ConfigurationComponent {
         shouldSkip = true;
         return
       }
+
+      headers.push(aminoHeader);
+      singleSeq.header = aminoHeader;
+      if (this.selectedfileFormat == 'amino') {
+        // console.log('amino = ', this.selectedfileFormat)
+        singleSeq.sequence = aminoSeq;
+      }
+      else if (this.selectedfileFormat == 'dna') {
+        // console.log('dna = ', this.selectedfileFormat)
+        singleSeq.DNA_sequence = aminoSeq;
+      }
+      this.realSendData.input_fasta.push(singleSeq);
     });
 
     if (this.hasDuplicateHeaders(headers)) {

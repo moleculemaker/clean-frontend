@@ -23,6 +23,7 @@ export interface SeqResult {
 export interface SingleSeqData {
   header: string;
   sequence: string;
+  DNA_sequence: string;
 }
 
 export interface PostSeqData {

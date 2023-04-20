@@ -20,12 +20,19 @@
                 <ng-container *ngIf="selectedInputMethod == 'copy_and_paste'">
                     <div class="panel_bar">
                         <h3>Sequences input</h3>
+                        
+                        <div class="buttons" *ngFor="let format of fileFormat">
+                            <p-radioButton name="format" [value]="format.value" [(ngModel)]="selectedfileFormat" [inputId]="format.label" (onClick)="submitValidate()"></p-radioButton>
+                            <label [for]="format.label" class="label">{{format.label}}</label>
+                        </div>
 
-                        <p-selectButton [options]="fileFormat" [(ngModel)]="selectedfileFormat" optionValue="value" (onOptionClick)="submitValidate()">
+                        <!-- <p-selectButton [options]="fileFormat" [(ngModel)]="selectedfileFormat"
+                            (onOptionClick)="submitValidate()">
                             <ng-template let-item>
                                 {{item.label}}
                             </ng-template>
-                        </p-selectButton>
+                        </p-selectButton> -->
+                        
 
                         <div class="spacer"></div>
 
@@ -43,6 +50,11 @@
                 <ng-container *ngIf="selectedInputMethod == 'use_example'">
                     <div class="panel_bar">
                         <h3>Example</h3>
+                        
+                        <!-- <div *ngFor="let example of exampleData">
+                            <p-radioButton name="example" [value]="example.label" [(ngModel)]="selectedExample" [inputId]="example.label" (onClick)="selectExample()"></p-radioButton>
+                            <label [for]="example.label" class="label">{{example.label}}</label>
+                        </div> -->
 
                         <p-selectButton [options]="exampleData" [(ngModel)]="selectedExample"
                             (onOptionClick)="selectExample()">
