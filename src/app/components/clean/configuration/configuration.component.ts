@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { SequenceService } from 'src/app/sequence.service';
 import { TrackingService } from 'src/app/tracking.service';
@@ -8,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { PostResponse, PostSeqData, SingleSeqData, ExampleData } from '../../../models';
 import { ResultsComponent } from '../results/results.component';
-import {NgHcaptchaService} from "ng-hcaptcha";
+import { NgHcaptchaService } from "ng-hcaptcha";
 
 @Component({
   selector: 'app-configuration',
@@ -28,6 +28,8 @@ export class ConfigurationComponent {
   disableCopyPaste: boolean = false;
   highTrafficMessage: Message[];
   checked: boolean;
+  getErrorResponse: boolean = false;
+  jobFailedMessage: Message[];
 
   inputMethods = [
     { label: 'Copy and Paste', icon: 'pi pi-copy', value: 'copy_and_paste' },
@@ -59,7 +61,8 @@ export class ConfigurationComponent {
     private _sequenceService: SequenceService,
     private httpClient: HttpClient,
     private trackingService: TrackingService,
-    private hcaptchaService: NgHcaptchaService
+    private hcaptchaService: NgHcaptchaService,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -67,6 +70,9 @@ export class ConfigurationComponent {
     this.highTrafficMessage = [
       { severity: 'info', detail: 'Due to the overwhelming popularity of the CLEAN tool, we are temporarily unable to predict EC numbers for new sequences. As we increase our capacity, please feel free to explore the tool with the example data we have provided, and visit us again soon!' },
     ];
+    this.jobFailedMessage = [
+      { severity: 'error', detail: ''}
+    ]
     // console.log(this.exampleData);
   }
 
@@ -121,7 +127,11 @@ export class ConfigurationComponent {
         },
         (error) => {
           // TODO replace this with a call to the message service, and display the correct error message
-          console.error('Error getting contacts via subscribe() method:', error);
+          this.ngZone.run(() => {
+            console.error('Error getting contacts via subscribe() method:', error.error.message);
+            this.getErrorResponse = true;
+            this.jobFailedMessage[0].detail = 'Job failed due to ' + error.error.message + '. Please try again, or click the feedback link at the bottom of the page to report a problem.'
+          });
         }
       );
     }

@@ -58,6 +58,11 @@
     }
 }
 
+:host ::ng-deep .p-message.p-message-error {
+    border-width: 0 0 0 0;
+    text-align: left;
+}
+
 .panel_bar {
     display: flex;
     align-items: center;
@@ -219,4 +224,10 @@
     display: inline-block;
     padding: 1rem 1rem;
     padding-left: 0px;
+}
+
+.failJob {
+    margin: auto;
+    text-align: center;
+    width: 100%;
 }

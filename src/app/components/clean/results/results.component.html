@@ -39,7 +39,7 @@
         </div>
 
         <ng-container *ngIf="contentLoaded">
-            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true" (sortFunction)="customSort($event)" [customSort]="true"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
                 <ng-template pTemplate="caption">
                     <div class="table_caption">

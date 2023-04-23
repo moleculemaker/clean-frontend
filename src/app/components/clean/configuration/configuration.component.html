@@ -4,6 +4,9 @@
         <div class="card" *ngIf="disableCopyPaste">
             <p-messages [(value)]="highTrafficMessage" [enableService]="false" [closable]="false"></p-messages>
         </div>
+        <div class="failJob" *ngIf="getErrorResponse">
+            <p-messages [(value)]="jobFailedMessage" [enableService]="false" [closable]="false"></p-messages>
+        </div>
         <h3>Enter your enzyme sequence here</h3>
         <h5>Choose an input method below</h5>
 
