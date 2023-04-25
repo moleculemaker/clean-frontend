@@ -25,7 +25,7 @@ export class ResultsComponent {
   failedJob: boolean = false;
   jobID: string;
   sendJobID: string | undefined;
-  downloadRows: string[][] = [['Identifier', 'Predicted EC Number']];
+  downloadRows: string[][] = [['Identifier', 'Predicted EC Number', 'Confidence Level']];
   exampleResponse: string;
   statusResponse: PollingResponseStatus;
   numOfSeq: number;
@@ -176,11 +176,14 @@ export class ResultsComponent {
   }
 
   downloadResult(): void {
-    this.downloadRows = [['Identifier', 'Predicted EC Number']];
+    this.downloadRows = [['Identifier', 'Predicted EC Number', 'Confidence Level']];
 
     this.rows.forEach(row => {
-      let temp = [row.sequence, row.ecNumbers.join(',')]
-      this.downloadRows.push(temp);
+      // let temp: string[] = [];
+      row.ecNumbers.forEach((num, index) => {
+        this.downloadRows.push([row.sequence, num,row.level[index]]);
+      })
+      // this.downloadRows.push(temp);
     });
     // console.log(this.downloadRows);
 
