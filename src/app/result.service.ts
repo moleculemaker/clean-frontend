@@ -3,16 +3,30 @@ import { Injectable } from '@angular/core';
 import { Observable, of, delay, timer, Subscription, Subject } from 'rxjs';
 import { PollingResponseStatus, PollingResponseResult } from './models';
 import { switchMap, tap, share, retry, takeUntil } from 'rxjs/operators';
+import {EnvVars} from "./models/envvars";
+import {EnvironmentService} from "./services/environment.service";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultService {
-
   private resuts$: Observable<PollingResponseStatus>;
   private stopPolling = new Subject();
-  _url_status: string = 'https://jobmgr.mmli1.ncsa.illinois.edu/api/v1' + '/job/status';
-  _url_result: string = 'https://jobmgr.mmli1.ncsa.illinois.edu/api/v1' + '/job/result';
+
+  private envs: EnvVars;
+
+  get hostname() {
+    return this.envs?.hostname || 'https://jobmgr.mmli1.ncsa.illinois.edu';
+  }
+  get apiBasePath() {
+    return this.envs?.basePath || 'api/v1';
+  }
+  get _url_status(): string {
+    return `${this.hostname}/${this.apiBasePath}/job/status`;
+  }
+  get _url_result(): string {
+    return `${this.hostname}/${this.apiBasePath}/job/result`;
+  }
   jobID: string;
   dummyChooseArray: number[] = [0, 0, 0, 0, 0];
   private dummyRunningResult: PollingResponseResult = {
@@ -62,10 +76,11 @@ export class ResultService {
     ]
   };
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private envService: EnvironmentService) {
+    this.envs = this.envService.getEnvConfig();
     this.resuts$ = timer(1, 10000).pipe(
       switchMap((x) =>
-        this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID})
+        this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
       retry(),
@@ -110,7 +125,7 @@ export class ResultService {
 
   getResponse(jobID: any): Observable<PollingResponseResult>{
     this.jobID = jobID;
-    return this.http.post<PollingResponseResult>(this._url_result, {'jobId' : jobID}) //should return a jobID
+    return this.http.post<PollingResponseResult>(this._url_result, {'jobId' : jobID}, { withCredentials: true }) //should return a jobID
   }
   getResult(jobID: any): Observable<PollingResponseStatus>{
     this.jobID = jobID;

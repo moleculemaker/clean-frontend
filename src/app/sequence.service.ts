@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 
 import { PostResponse, PostSeqData, ExampleData } from './models';
+import {EnvironmentService} from "./services/environment.service";
+import {EnvVars} from "./models/envvars";
 
 @Injectable({
   providedIn: 'root'
@@ -25,9 +27,21 @@ export class SequenceService {
     created_at: "2020-01-01 10:10:10"
   };
 
-  private _url: string = 'https://jobmgr.mmli1.ncsa.illinois.edu/api/v1' + '/job/submit';
+  private envs: EnvVars;
 
-  constructor(private http: HttpClient) { }
+  get hostname() {
+    return this.envs?.hostname || 'https://jobmgr.mmli1.ncsa.illinois.edu';
+  }
+  get apiBasePath() {
+    return this.envs?.basePath || 'api/v1';
+  }
+  get _url(): string {
+    return `${this.hostname}/${this.apiBasePath}/job/submit`;
+  }
+
+  constructor(private http: HttpClient, private envService: EnvironmentService) {
+    this.envs = this.envService.getEnvConfig();
+  }
 
   // getResponse(sequenceData: PostSeqData): Observable<PostResponse>{
   //   const respond = of(this.responseFromBackend);
@@ -43,6 +57,6 @@ export class SequenceService {
 
 
   getResponse(sequenceData: PostSeqData): Observable<PostResponse>{
-    return this.http.post<PostResponse>(this._url, sequenceData); //should return a jobID
+    return this.http.post<PostResponse>(this._url, sequenceData, { withCredentials: true }); //should return a jobID
   }
 }
