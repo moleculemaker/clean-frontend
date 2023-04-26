@@ -20,16 +20,36 @@ spec:
           image: {{ .Values.controller.image }}
 
           env:
+   
           - name: JOB_MANAGER_API_HOSTNAME
-            value: {{ .Values.config.hostname | quote }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: hostname
+
           - name: JOB_MANAGER_API_BASEPATH
-            value: {{ .Values.config.basePath | quote }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: basePath
+ 
           - name: OAUTH_SIGNIN_URL
-            value: {{ .Values.config.signInUrl | quote }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: signInUrl
+
           - name: OAUTH_SIGNOUT_URL
-            value: {{ .Values.config.signOutUrl | quote }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: signOutUrl
+
           - name: OAUTH_USERINFO_URL
-            value: {{ .Values.config.userInfoUrl | quote }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: userInfoUrl
 
 
           ports:
