@@ -1,3 +1,7 @@
 ingress:
   ingressClassName: nginx
+  hostname: clean.proxy.localhost
+  tls: true
 
+controller:
+  image: moleculemaker/clean-frontend:auth

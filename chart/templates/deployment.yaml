@@ -19,6 +19,19 @@ spec:
         - name: clean-frontend
           image: {{ .Values.controller.image }}
 
+          env:
+          - name: JOB_MANAGER_API_HOSTNAME
+            value: {{ .Values.config.hostname | quote }}
+          - name: JOB_MANAGER_API_BASEPATH
+            value: {{ .Values.config.basePath | quote }}
+          - name: OAUTH_SIGNIN_URL
+            value: {{ .Values.config.signInUrl | quote }}
+          - name: OAUTH_SIGNOUT_URL
+            value: {{ .Values.config.signOutUrl | quote }}
+          - name: OAUTH_USERINFO_URL
+            value: {{ .Values.config.userInfoUrl | quote }}
+
+
           ports:
             - containerPort: 80
           imagePullPolicy: Always
