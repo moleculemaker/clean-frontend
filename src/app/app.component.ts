@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
-import {UserInfoService} from "./userinfo.service";
+import {UserInfoService} from "./services/userinfo.service";
+import {EnvironmentService} from "./services/environment.service";
+import {EnvVars} from "./models/envvars";
+import {MenuItem} from "primeng/api";
 
 @Component({
   selector: 'app-root',
@@ -14,14 +17,22 @@ export class AppComponent {
   comingSoonTimerID: number|null = null;
   autocloseComingSoonPopup: boolean = true;
 
+  envs: EnvVars;
+
+  get userMenuItems(): Array<MenuItem> {
+    return this.userInfo ? [{ label: 'Sign Out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout() }] : [];
+  }
+
   get userInfo() {
     return this.userInfoService.userInfo;
   }
 
-  constructor(private userInfoService: UserInfoService) {
+  constructor(private userInfoService: UserInfoService, private envService: EnvironmentService) {
+
   }
 
   ngOnInit() {
+      this.envs = this.envService.getEnvConfig();
       this.userInfoService.fetchUserInfo();
       this.comingSoonTimerID = setTimeout(()=>{
         this.toggleComingSoonPopup();
@@ -47,16 +58,10 @@ export class AppComponent {
   }
 
   login() {
-    const baseUrl = this.userInfoService.baseUrl;
-    const startPath = this.userInfoService.startPath;
-    const redirect = this.userInfoService.redirect;
-    window.location.href = `${baseUrl}${startPath}?rd=${encodeURIComponent(redirect)}`;
+    this.userInfoService.login();
   }
 
   logout() {
-    const baseUrl = this.userInfoService.baseUrl;
-    const signOutPath = this.userInfoService.signOutPath;
-    const redirect = this.userInfoService.redirect;
-    window.location.href = `${baseUrl}${signOutPath}?rd=${encodeURIComponent(redirect)}`;
+    this.userInfoService.logout();
   }
 }

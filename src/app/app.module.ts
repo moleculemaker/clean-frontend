@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { FormsModule } from '@angular/forms';
@@ -28,6 +28,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgxMatomoTrackerModule } from '@ngx-matomo/tracker';
 import { NgxMatomoRouterModule } from '@ngx-matomo/router';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
+import { EnvironmentService } from "./services/environment.service";
+import { MenuModule } from "primeng/menu";
+
+const initAppFn = (envService: EnvironmentService) => {
+  return () => envService.loadEnvConfig('/assets/config/envvars.json');
+};
 
 @NgModule({
   declarations: [
@@ -47,6 +53,7 @@ import { NgHcaptchaModule } from 'ng-hcaptcha';
     ButtonModule,
     InputTextareaModule,
     PanelModule,
+    MenuModule,
     ProgressBarModule,
     SelectButtonModule,
     SkeletonModule,
@@ -65,7 +72,15 @@ import { NgHcaptchaModule } from 'ng-hcaptcha';
       languageCode: 'en' // optional, will default to browser language
   })
   ],
-  providers: [SequenceService],
+  providers: [
+    SequenceService,
+    EnvironmentService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initAppFn,
+      multi: true,
+      deps: [EnvironmentService],
+    },],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -60,7 +60,13 @@ header {
         flex-grow: 1;
     }
 
-    .login_button, .logout_button {
+    .user_menu {
+      /* Coming Soon banner = 8000, top banner = 4500, this should be between them */
+      cursor: pointer;
+      z-index: 5500;
+    }
+
+    .login_button, .user_menu_button {
       cursor: pointer;
 
       color: css_var('button_secondary');
@@ -200,7 +206,7 @@ header {
 
 .tool_header {
     top: 0px;
-    z-index: get_index(interface);
+    z-index: 1000;
     @include position(sticky);
 
     color: css_var('background');
