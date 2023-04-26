@@ -28,6 +28,10 @@ COPY --from=build /usr/local/app/dist/clean /usr/share/nginx/html
 # Copy the nginx config file, which has a try_files rule for SPA routing
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
+# Run our envloader script before starting NGINX
+COPY entrypoint.sh /entrypoint.sh
+CMD [ "/entrypoint.sh" ]
+
 # Expose port 80
 EXPOSE 80
 
