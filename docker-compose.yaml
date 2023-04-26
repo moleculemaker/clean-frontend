@@ -2,7 +2,7 @@ version: '3'
 
 services:
   clean-frontend:
-    image: moleculemaker/clean-frontend:auth
+    image: moleculemaker/clean-frontend:staging
     container_name: clean-frontend
     build:
       context: .
