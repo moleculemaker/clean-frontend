@@ -33,6 +33,7 @@ export class ResultsComponent {
   preComputedMessage: Message[];
   jobFailedMessage: Message[];
   decendOrder: boolean = true;
+  filteredResult: PredictionRow[] = [];
 
   constructor(private router: Router, private _resultService: ResultService, private httpClient: HttpClient) {
 
@@ -92,6 +93,7 @@ export class ResultsComponent {
       });
       this.rows.push(temp);
     })
+    this.filteredResult = this.rows;
   }
 
   parseExampleResult(): void {
@@ -121,6 +123,7 @@ export class ResultsComponent {
       });
       this.rows.push(temp);
     });
+    this.filteredResult = this.rows;
   }
 
   getResult(): void {
@@ -175,10 +178,14 @@ export class ResultsComponent {
     }
   }
 
+  onTableFiltered(event: SortEvent, sorted: PredictionRow[]) {
+    // console.log(sorted);
+    this.filteredResult = sorted;
+  }
+
   downloadResult(): void {
     this.downloadRows = [['Identifier', 'Predicted EC Number', 'Confidence Level']];
-
-    this.rows.forEach(row => {
+    this.filteredResult.forEach(row => {
       // let temp: string[] = [];
       row.ecNumbers.forEach((num, index) => {
         this.downloadRows.push([row.sequence, num,row.level[index]]);

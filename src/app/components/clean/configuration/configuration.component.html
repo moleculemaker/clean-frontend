@@ -85,7 +85,7 @@
                 #email="ngModel" email="true" (input)="enterEmail()">
             </div>
             <div class="email">
-                <p-checkbox [(ngModel)]="checked" [binary]="true" inputId="binary" label="Check the box to receive future updates!"></p-checkbox>
+                <p-checkbox [(ngModel)]="checked" [binary]="true" inputId="binary" label="Check the box to receive future updates!" (onChange)="subscribeMailingList()"></p-checkbox>
             </div>
 
         </ng-container>

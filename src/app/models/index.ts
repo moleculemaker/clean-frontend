@@ -39,6 +39,16 @@ export interface PostResponse {
   created_at: string;
 }
 
+export interface PostEmailResponse {
+  status: string;
+  message: string;
+}
+
+export interface PostEmailData {
+  email: string;
+  captcha_token: string;
+}
+
 export interface PollingResponseStatus {
   jobId: string;
   url: string;

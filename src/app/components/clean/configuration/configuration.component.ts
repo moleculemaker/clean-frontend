@@ -6,7 +6,7 @@ import { TrackingService } from 'src/app/tracking.service';
 import { Message } from 'primeng/api';
 import { switchMap } from 'rxjs/operators';
 
-import { PostResponse, PostSeqData, SingleSeqData, ExampleData } from '../../../models';
+import { PostResponse, PostSeqData, SingleSeqData, ExampleData, PostEmailData } from '../../../models';
 import { ResultsComponent } from '../results/results.component';
 import { NgHcaptchaService } from "ng-hcaptcha";
 
@@ -55,6 +55,11 @@ export class ConfigurationComponent {
     user_email: '',
     captcha_token: ''
   };
+
+  emailData: PostEmailData = {
+    email: '',
+    captcha_token: ''
+  }
 
   constructor(
     private router: Router,
@@ -134,6 +139,23 @@ export class ConfigurationComponent {
           });
         }
       );
+    }
+  }
+
+  subscribeMailingList() {
+    if (this.checked) {
+      this._sequenceService.addEmail(this.userEmail)
+      .subscribe( data => {
+        console.log('status = ', data.status);
+        console.log('message = ', data.message);
+      });
+    }
+    else {
+      this._sequenceService.removeEmail(this.userEmail)
+      .subscribe( data => {
+        console.log('status = ', data.status);
+        console.log('message = ', data.message);
+      });
     }
   }
 
