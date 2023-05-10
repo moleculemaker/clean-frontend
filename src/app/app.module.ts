@@ -18,6 +18,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { MessagesModule } from 'primeng/messages';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RadioButtonModule } from 'primeng/radiobutton';
+import { DropdownModule } from 'primeng/dropdown';
 
 
 import { LandingPageComponent} from './components/landing-page/landing-page.component';
@@ -59,6 +60,7 @@ import { NgHcaptchaModule } from 'ng-hcaptcha';
     HttpClientModule,
     CheckboxModule,
     RadioButtonModule,
+    DropdownModule,
     NgxMatomoTrackerModule.forRoot({
       siteId: 3,
       trackerUrl: 'https://matomo.mmli1.ncsa.illinois.edu/'

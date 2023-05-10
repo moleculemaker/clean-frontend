@@ -39,7 +39,7 @@
         </div>
 
         <ng-container *ngIf="contentLoaded">
-            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true" (sortFunction)="customSort($event)" [customSort]="true" [globalFilterFields]="['sequence', 'ecNumbers']" (onFilter)="onTableFiltered($event, table.filteredValue)"
+            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true" (sortFunction)="customSort($event)" [customSort]="true" [globalFilterFields]="['sequence', 'ecNumbers', 'level']" (onFilter)="onTableFiltered($event, table.filteredValue)"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
                 <ng-template pTemplate="caption">
                     <div class="table_caption">
@@ -51,10 +51,12 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
 -->
                         </div>
 
-                        <span class="p-input-icon-left ml-auto">
+                        <!-- <span class="p-input-icon-left ml-auto">
                             <i class="pi pi-search"></i>
                             <input pInputTextarea type="text" (input)="table.filterGlobal($any($event.target).value, 'contains')" placeholder="Identifier / EcNumbers" />
-                        </span>
+                        </span> -->
+                        <button pButton label="Filter" icon="pi pi-search" class="p-button-outlined" 
+                            (click)="filterResult()"></button>
                         
 
                         <button pButton label="Download Results" icon="pi pi-download" class="p-button-sm"
@@ -69,6 +71,29 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                         <th pSortableColumn="ecNumbers">Predicted EC Number <p-sortIcon field="ecNumbers"></p-sortIcon>
                         </th>
                         <th pSortableColumn="score">Confidence Level <p-sortIcon field="score"></p-sortIcon></th>
+                    </tr>
+                    <tr *ngIf="enableFilter">
+                        <th>
+                            <span class="p-input-icon-left ml-auto">
+                                <i class="pi pi-search"></i>
+                                <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'sequence', 'contains')" placeholder="Identifier" />
+                                </span>
+                        </th>
+                        <th>
+                            <!-- <p-columnFilter type="text" field="ecNumbers"></p-columnFilter> -->
+                            <span class="p-input-icon-left ml-auto">
+                            <i class="pi pi-search"></i>
+                            <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'ecNumbers', 'contains')" placeholder="EcNumbers"/>
+                            </span>
+                        </th>
+                        <th>
+                            <!-- <p-columnFilter type="text" field="level"></p-columnFilter> -->
+                            <p-dropdown [options]="levels" (onChange)="table.filter($event.value, 'level', 'contains')" styleClass="p-column-filter" placeholder="Select a Level" [showClear]="true">
+                                <ng-template let-option pTemplate="option">
+                                    <span>{{option}}</span>
+                                </ng-template>
+                            </p-dropdown>
+                        </th>
                     </tr>
                 </ng-template>
 

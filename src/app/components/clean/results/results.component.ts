@@ -34,6 +34,8 @@ export class ResultsComponent {
   jobFailedMessage: Message[];
   decendOrder: boolean = true;
   filteredResult: PredictionRow[] = [];
+  enableFilter: boolean = false;
+  levels: string[] = ['Low', 'Medium', 'High'];
 
   constructor(private router: Router, private _resultService: ResultService, private httpClient: HttpClient) {
 
@@ -181,6 +183,10 @@ export class ResultsComponent {
   onTableFiltered(event: SortEvent, sorted: PredictionRow[]) {
     // console.log(sorted);
     this.filteredResult = sorted;
+  }
+
+  filterResult() {
+    this.enableFilter = !this.enableFilter;
   }
 
   downloadResult(): void {
