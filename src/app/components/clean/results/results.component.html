@@ -90,7 +90,7 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                             <!-- <p-columnFilter type="text" field="level"></p-columnFilter> -->
                             <p-dropdown [options]="levels" (onChange)="table.filter($event.value, 'level', 'contains')" styleClass="p-column-filter" placeholder="Select a Level" [showClear]="true">
                                 <ng-template let-option pTemplate="option">
-                                    <span>{{option}}</span>
+                                    <span> <span [ngClass]="{'lowLevel': option === 'Low', 'midLevel': option === 'Medium', 'highLevel': option === 'High'}">&#x2022; </span>{{option}}</span>
                                 </ng-template>
                             </p-dropdown>
                         </th>
@@ -109,7 +109,7 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                         <!-- <td>{{row.ecNumbers.join(', ')}}</td> -->
                         <td>
                             <div *ngFor="let level of row.level">
-                                {{level}}
+                                <span [ngClass]="{'lowLevel': level === 'Low', 'midLevel': level === 'Medium', 'highLevel': level === 'High'}">&#x2022; </span> {{level}}
                             </div>
                         </td>
                         <!-- <td>{{row.score.join(', ')}}</td> -->
