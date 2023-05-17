@@ -4,19 +4,19 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   labels:
-    app: chemscraper-frontend
+    app: clean-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chemscraper-frontend
+      app: clean-frontend
   template:
     metadata:
       labels:
-        app: chemscraper-frontend
+        app: clean-frontend
     spec:
       containers:
-        - name: chemscraper-frontend
+        - name: clean-frontend
           image: {{ .Values.controller.image }}
 
           ports:
