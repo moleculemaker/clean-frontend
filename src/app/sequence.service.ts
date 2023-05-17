@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 
-import { PostResponse, PostSeqData, ExampleData } from './models';
+import { PostResponse, PostSeqData, ExampleData, PostEmailResponse } from './models';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class SequenceService {
     created_at: "2020-01-01 10:10:10"
   };
 
-  private _url: string = 'https://jobmgr.mmli1.ncsa.illinois.edu/api/v1' + '/job/submit';
+  private _url: string = 'https://jobmgr.mmli1.ncsa.illinois.edu/api/v1';
 
   constructor(private http: HttpClient) { }
 
@@ -43,6 +43,14 @@ export class SequenceService {
 
 
   getResponse(sequenceData: PostSeqData): Observable<PostResponse>{
-    return this.http.post<PostResponse>(this._url, sequenceData); //should return a jobID
+    return this.http.post<PostResponse>(this._url  + '/job/submit', sequenceData); //should return a jobID
+  }
+
+  addEmail(userEmail: string): Observable<PostEmailResponse>{
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/add', {"email": userEmail});
+  }
+
+  removeEmail(userEmail: string): Observable<PostEmailResponse>{
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/delete', {"email": userEmail});
   }
 }

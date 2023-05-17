@@ -39,7 +39,7 @@
         </div>
 
         <ng-container *ngIf="contentLoaded">
-            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+            <p-table *ngIf="!failedJob" #table [value]="rows" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true" (sortFunction)="customSort($event)" [customSort]="true" [globalFilterFields]="['sequence', 'ecNumbers', 'level']" (onFilter)="onTableFiltered($event, table.filteredValue)"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
                 <ng-template pTemplate="caption">
                     <div class="table_caption">
@@ -51,8 +51,17 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
 -->
                         </div>
 
+                        <!-- <span class="p-input-icon-left ml-auto">
+                            <i class="pi pi-search"></i>
+                            <input pInputTextarea type="text" (input)="table.filterGlobal($any($event.target).value, 'contains')" placeholder="Identifier / EcNumbers" />
+                        </span> -->
+                        <button pButton label="Filter" icon="pi pi-search" class="p-button-outlined" 
+                            (click)="filterResult()"></button>
+                        
+
                         <button pButton label="Download Results" icon="pi pi-download" class="p-button-sm"
                             (click)="downloadResult()"></button>
+                        
                     </div>
                 </ng-template>
 
@@ -62,6 +71,29 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                         <th pSortableColumn="ecNumbers">Predicted EC Number <p-sortIcon field="ecNumbers"></p-sortIcon>
                         </th>
                         <th pSortableColumn="score">Confidence Level <p-sortIcon field="score"></p-sortIcon></th>
+                    </tr>
+                    <tr *ngIf="enableFilter">
+                        <th>
+                            <span class="p-input-icon-left ml-auto">
+                                <i class="pi pi-search"></i>
+                                <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'sequence', 'contains')" placeholder="Identifier" />
+                                </span>
+                        </th>
+                        <th>
+                            <!-- <p-columnFilter type="text" field="ecNumbers"></p-columnFilter> -->
+                            <span class="p-input-icon-left ml-auto">
+                            <i class="pi pi-search"></i>
+                            <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'ecNumbers', 'contains')" placeholder="EcNumbers"/>
+                            </span>
+                        </th>
+                        <th>
+                            <!-- <p-columnFilter type="text" field="level"></p-columnFilter> -->
+                            <p-dropdown [options]="levels" (onChange)="table.filter($event.value, 'level', 'contains')" styleClass="p-column-filter" placeholder="Select a Level" [showClear]="true">
+                                <ng-template let-option pTemplate="option">
+                                    <span> <span [ngClass]="{'lowLevel': option === 'Low', 'midLevel': option === 'Medium', 'highLevel': option === 'High'}">&#x2022; </span>{{option}}</span>
+                                </ng-template>
+                            </p-dropdown>
+                        </th>
                     </tr>
                 </ng-template>
 
@@ -77,7 +109,7 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                         <!-- <td>{{row.ecNumbers.join(', ')}}</td> -->
                         <td>
                             <div *ngFor="let level of row.level">
-                                {{level}}
+                                <span [ngClass]="{'lowLevel': level === 'Low', 'midLevel': level === 'Medium', 'highLevel': level === 'High'}">&#x2022; </span> {{level}}
                             </div>
                         </td>
                         <!-- <td>{{row.score.join(', ')}}</td> -->

@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { SequenceService } from 'src/app/sequence.service';
 import { TrackingService } from 'src/app/tracking.service';
 import { Message } from 'primeng/api';
 import { switchMap } from 'rxjs/operators';
 
-import { PostResponse, PostSeqData, SingleSeqData, ExampleData } from '../../../models';
+import { PostResponse, PostSeqData, SingleSeqData, ExampleData, PostEmailData } from '../../../models';
 import { ResultsComponent } from '../results/results.component';
-import {NgHcaptchaService} from "ng-hcaptcha";
+import { NgHcaptchaService } from "ng-hcaptcha";
 
 @Component({
   selector: 'app-configuration',
@@ -16,7 +16,6 @@ import {NgHcaptchaService} from "ng-hcaptcha";
   styleUrls: ['./configuration.component.scss']
 })
 export class ConfigurationComponent {
-  // sequenceData: string = '>seq1\nAVLIMCFYWH\n>seq2\nLIMCFYWHKRQNED\n>seq3\nMCFYPARQNEDVLWHKRQ';
   sequenceData: string = '';
   validationText: string = '';
   isValid: boolean = false;
@@ -28,6 +27,9 @@ export class ConfigurationComponent {
   private maxSeqNum: number = 20;
   disableCopyPaste: boolean = false;
   highTrafficMessage: Message[];
+  checked: boolean;
+  getErrorResponse: boolean = false;
+  jobFailedMessage: Message[];
 
   inputMethods = [
     { label: 'Copy and Paste', icon: 'pi pi-copy', value: 'copy_and_paste' },
@@ -35,23 +37,37 @@ export class ConfigurationComponent {
   ];
   selectedInputMethod: any | null = 'copy_and_paste'; //this.inputMethods[0];
 
+  fileFormat = [
+    { label: 'Amino Acid Sequences', icon: 'pi pi-copy', value: 'amino' },
+    { label: 'DNA Sequences', icon: 'pi pi-copy', value: 'dna' },
+    { label: 'NCBI ascension number', icon: 'pi pi-copy', value: 'ncbi' },
+  ]
+  selectedfileFormat: any | null = 'amino';
+
   exampleData: ExampleData[] = [];
   selectedExample: any | null = this.exampleData[0];
 
   seqNum: number = 0;
   private validAminoAcid = new RegExp("[^GPAVLIMCFYWHKRQNEDST]", "i");
+  private validDNA = new RegExp("[^ACTG]", "i");
   realSendData: PostSeqData = {
     input_fasta: [],
     user_email: '',
     captcha_token: ''
   };
 
+  emailData: PostEmailData = {
+    email: '',
+    captcha_token: ''
+  }
+
   constructor(
     private router: Router,
     private _sequenceService: SequenceService,
     private httpClient: HttpClient,
     private trackingService: TrackingService,
-    private hcaptchaService: NgHcaptchaService
+    private hcaptchaService: NgHcaptchaService,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit() {
@@ -59,6 +75,9 @@ export class ConfigurationComponent {
     this.highTrafficMessage = [
       { severity: 'info', detail: 'Due to the overwhelming popularity of the CLEAN tool, we are temporarily unable to predict EC numbers for new sequences. As we increase our capacity, please feel free to explore the tool with the example data we have provided, and visit us again soon!' },
     ];
+    this.jobFailedMessage = [
+      { severity: 'error', detail: ''}
+    ]
     // console.log(this.exampleData);
   }
 
@@ -93,7 +112,7 @@ export class ConfigurationComponent {
   }
 
   submitData() {
-    // console.log(this.realSendData);
+    console.log(this.realSendData);
     // if the user uses example file, return precompiled result
     // else send sequence to backend, jump to results page
     if (this.selectedInputMethod == 'use_example') {
@@ -113,9 +132,30 @@ export class ConfigurationComponent {
         },
         (error) => {
           // TODO replace this with a call to the message service, and display the correct error message
-          console.error('Error getting contacts via subscribe() method:', error);
+          this.ngZone.run(() => {
+            console.error('Error getting contacts via subscribe() method:', error.error.message);
+            this.getErrorResponse = true;
+            this.jobFailedMessage[0].detail = 'Job failed due to ' + error.error.message + '. Please try again, or click the feedback link at the bottom of the page to report a problem.'
+          });
         }
       );
+    }
+  }
+
+  subscribeMailingList() {
+    if (this.checked) {
+      this._sequenceService.addEmail(this.userEmail)
+      .subscribe( data => {
+        console.log('status = ', data.status);
+        console.log('message = ', data.message);
+      });
+    }
+    else {
+      this._sequenceService.removeEmail(this.userEmail)
+      .subscribe( data => {
+        console.log('status = ', data.status);
+        console.log('message = ', data.message);
+      });
     }
   }
 
@@ -124,11 +164,21 @@ export class ConfigurationComponent {
   }
 
   isInvalidFasta(seq: string) {
-    return this.validAminoAcid.test(seq);
+    if (this.selectedfileFormat == 'amino') {
+      return this.validAminoAcid.test(seq);
+    }
+    else if (this.selectedfileFormat == 'dna'){
+      return this.validDNA.test(seq);
+    }
+    return true;
   }
 
   enterEmail() {
     this.realSendData.user_email = this.userEmail;
+  }
+
+  submitValidateNCBI() {
+
   }
 
   submitValidate() {
@@ -163,7 +213,8 @@ export class ConfigurationComponent {
     splitString.forEach((seq: string) => {
       let singleSeq: SingleSeqData = {
         header: '',
-        sequence: ''
+        sequence: '',
+        DNA_sequence: ''
       };
       this.seqNum += 1;
       let aminoHeader: string = seq.split('\n')[0];
@@ -189,11 +240,6 @@ export class ConfigurationComponent {
         return
       }
 
-      headers.push(aminoHeader);
-      singleSeq.header = aminoHeader;
-      singleSeq.sequence = aminoSeq;
-      this.realSendData.input_fasta.push(singleSeq);
-
       if (this.isInvalidFasta(aminoSeq)) {
         this.validationText = 'Invalid sequence: ' + warningMessageHeader + ', This is not a valid fasta file format!';
         this.isValid = false;
@@ -214,6 +260,18 @@ export class ConfigurationComponent {
         shouldSkip = true;
         return
       }
+
+      headers.push(aminoHeader);
+      singleSeq.header = aminoHeader;
+      if (this.selectedfileFormat == 'amino') {
+        // console.log('amino = ', this.selectedfileFormat)
+        singleSeq.sequence = aminoSeq;
+      }
+      else if (this.selectedfileFormat == 'dna') {
+        // console.log('dna = ', this.selectedfileFormat)
+        singleSeq.DNA_sequence = aminoSeq;
+      }
+      this.realSendData.input_fasta.push(singleSeq);
     });
 
     if (this.hasDuplicateHeaders(headers)) {

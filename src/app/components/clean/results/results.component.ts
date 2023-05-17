@@ -5,7 +5,7 @@ import { interval } from "rxjs/internal/observable/interval";
 import { Subscription } from 'rxjs';
 import { startWith, switchMap } from "rxjs/operators";
 import { Router } from '@angular/router';
-import { Message } from 'primeng/api';
+import { Message, SortEvent } from 'primeng/api';
 
 import { PredictionRow, PollingResponseResult, PollingResponseStatus, SingleSeqResult, SeqResult } from '../../../models';
 
@@ -25,13 +25,17 @@ export class ResultsComponent {
   failedJob: boolean = false;
   jobID: string;
   sendJobID: string | undefined;
-  downloadRows: string[][] = [['Identifier', 'Predicted EC Number']];
+  downloadRows: string[][] = [['Identifier', 'Predicted EC Number', 'Confidence Level']];
   exampleResponse: string;
   statusResponse: PollingResponseStatus;
   numOfSeq: number;
   useExample: boolean = false;
   preComputedMessage: Message[];
   jobFailedMessage: Message[];
+  decendOrder: boolean = true;
+  filteredResult: PredictionRow[] = [];
+  enableFilter: boolean = false;
+  levels: string[] = ['Low', 'Medium', 'High'];
 
   constructor(private router: Router, private _resultService: ResultService, private httpClient: HttpClient) {
 
@@ -91,10 +95,11 @@ export class ResultsComponent {
       });
       this.rows.push(temp);
     })
+    this.filteredResult = this.rows;
   }
 
   parseExampleResult(): void {
-    this.exampleResponse.split('\n').forEach((seq: string) => {
+    this.exampleResponse.split('\n').slice(0,-1).forEach((seq: string) => {
       let temp: PredictionRow = {
         sequence: '',
         ecNumbers: [],
@@ -120,6 +125,7 @@ export class ResultsComponent {
       });
       this.rows.push(temp);
     });
+    this.filteredResult = this.rows;
   }
 
   getResult(): void {
@@ -174,12 +180,23 @@ export class ResultsComponent {
     }
   }
 
-  downloadResult(): void {
-    this.downloadRows = [['Identifier', 'Predicted EC Number']];
+  onTableFiltered(event: SortEvent, sorted: PredictionRow[]) {
+    // console.log(sorted);
+    this.filteredResult = sorted;
+  }
 
-    this.rows.forEach(row => {
-      let temp = [row.sequence, row.ecNumbers.join(',')]
-      this.downloadRows.push(temp);
+  filterResult() {
+    this.enableFilter = !this.enableFilter;
+  }
+
+  downloadResult(): void {
+    this.downloadRows = [['Identifier', 'Predicted EC Number', 'Confidence Level']];
+    this.filteredResult.forEach(row => {
+      // let temp: string[] = [];
+      row.ecNumbers.forEach((num, index) => {
+        this.downloadRows.push([row.sequence, num,row.level[index]]);
+      })
+      // this.downloadRows.push(temp);
     });
     // console.log(this.downloadRows);
 
@@ -192,6 +209,86 @@ export class ResultsComponent {
     // window.open(url);
     anchor.href = url;
     anchor.click();
+  }
+
+  customSort(event: SortEvent) {
+    if (event.field == 'sequence') {
+      event.data?.sort((d1,d2) => {
+        let v1 = d1[event.field!];
+        let v2 = d2[event.field!];
+        return event.order === -1 ? v1.localeCompare(v2) : v2.localeCompare(v1);
+      });
+    }
+    else if (event.field == 'ecNumbers') {
+      event.data?.sort((d1,d2) => {
+        let v1 = d1[event.field!][0];
+        let v2 = d2[event.field!][0];
+        return event.order === -1 ? v1.localeCompare(v2) : v2.localeCompare(v1);
+      });
+    }
+    if (event.field == 'score') {
+      if (event.order == 1) {
+        // ascending low -> high
+        this.rows.forEach((element, index, array) => {
+          let tempArray: any[] = [];
+          element['score'].forEach((element2, index2) => {
+            tempArray.push([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
+            // console.log([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
+          });
+          // console.log('temp = ', tempArray);
+          tempArray.sort((a, b) => {
+            // console.log(a[1], b[1]);
+            if (a[1] < b[1]) {
+              return -1;
+            }
+            if (a[1] > b[1]) {
+              return 1;
+            }
+            return 0;
+          });
+          array[index]['ecNumbers'] = tempArray.map((subarray) => subarray[0]);
+          array[index]['score'] = tempArray.map((subarray) => subarray[1]);
+          array[index]['level'] = tempArray.map((subarray) => subarray[2]);
+          // console.log(array[index]['level']);
+          // console.log(this.rows[index]['level']);
+        });
+      }
+      else {
+        // decending high -> low
+        this.rows.forEach((element, index, array) => {
+          let tempArray: any[] = [];
+          
+          element['score'].forEach((element2, index2) => {
+            tempArray.push([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
+            // console.log([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
+          });
+
+          // console.log('temp = ', tempArray);
+          tempArray.sort((a, b) => {
+            // console.log(a[1], b[1]);
+            if (a[1] > b[1]) {
+              return -1;
+            }
+            if (a[1] < b[1]) {
+              return 1;
+            }
+            return 0;
+          });
+          array[index]['ecNumbers'] = tempArray.map((subarray) => subarray[0]);
+          array[index]['score'] = tempArray.map((subarray) => subarray[1]);
+          array[index]['level'] = tempArray.map((subarray) => subarray[2]);
+          // console.log(array[index]['level']);
+          // console.log(this.rows[index]['level']);
+        });
+      }
+
+      event.data?.sort((d1,d2) => {
+        let v1 = d1[event.field!][0];
+        let v2 = d2[event.field!][0];
+        return event.order === -1 ? v2 - v1 : v1 - v2;
+      });
+    }
+    
   }
 
   copyAndPasteURL(): void {
