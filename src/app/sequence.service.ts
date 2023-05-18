@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of, delay } from 'rxjs';
 
-import { PostResponse, PostSeqData, ExampleData } from './models';
-import {EnvironmentService} from "./services/environment.service";
-import {EnvVars} from "./models/envvars";
+import { PostResponse, PostSeqData, ExampleData, PostEmailResponse } from './models';
+import { EnvironmentService } from "./services/environment.service";
+import { EnvVars } from "./models/envvars";
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class SequenceService {
     return this.envs?.basePath || 'api/v1';
   }
   get _url(): string {
-    return `${this.hostname}/${this.apiBasePath}/job/submit`;
+    return `${this.hostname}/${this.apiBasePath}`;
   }
 
   constructor(private http: HttpClient, private envService: EnvironmentService) {
@@ -57,6 +57,14 @@ export class SequenceService {
 
 
   getResponse(sequenceData: PostSeqData): Observable<PostResponse>{
-    return this.http.post<PostResponse>(this._url, sequenceData, { withCredentials: true }); //should return a jobID
+    return this.http.post<PostResponse>(this._url + '/job/submit', sequenceData, { withCredentials: true }); //should return a jobID
+  }
+
+  addEmail(userEmail: string): Observable<PostEmailResponse>{
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/add', {"email": userEmail});
+  }
+
+  removeEmail(userEmail: string): Observable<PostEmailResponse>{
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/delete', {"email": userEmail});
   }
 }

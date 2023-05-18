@@ -23,6 +23,7 @@ export interface SeqResult {
 export interface SingleSeqData {
   header: string;
   sequence: string;
+  DNA_sequence: string;
 }
 
 export interface PostSeqData {
@@ -36,6 +37,16 @@ export interface PostResponse {
   url: string;
   status: number;
   created_at: string;
+}
+
+export interface PostEmailResponse {
+  status: string;
+  message: string;
+}
+
+export interface PostEmailData {
+  email: string;
+  captcha_token: string;
 }
 
 export interface PollingResponseStatus {

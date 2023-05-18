@@ -58,6 +58,11 @@
     }
 }
 
+:host ::ng-deep .p-message.p-message-error {
+    border-width: 0 0 0 0;
+    text-align: left;
+}
+
 .panel_bar {
     display: flex;
     align-items: center;
@@ -80,6 +85,18 @@
     .spacer {
         flex-grow: 1;
     }
+
+    .buttons {
+        // border: 1px solid #224063;
+        display: flex;
+        align-items: center;
+        .label {
+            padding: 0.5rem;
+            // border: 1px solid #224063;
+        }
+    }
+
+    
 }
 
 .validation {
@@ -201,4 +218,16 @@
     padding: $padding ($padding * 1.5);
 
     overflow-wrap: break-word;
+}
+
+.email {
+    display: inline-block;
+    padding: 1rem 1rem;
+    padding-left: 0px;
+}
+
+.failJob {
+    margin: auto;
+    text-align: center;
+    width: 100%;
 }
