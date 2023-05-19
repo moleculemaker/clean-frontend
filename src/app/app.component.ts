@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import {UserInfoService} from "./services/userinfo.service";
+import {EnvironmentService} from "./services/environment.service";
+import {EnvVars} from "./models/envvars";
+import {MenuItem} from "primeng/api";
 
 @Component({
   selector: 'app-root',
@@ -13,7 +17,23 @@ export class AppComponent {
   comingSoonTimerID: number|null = null;
   autocloseComingSoonPopup: boolean = true;
 
+  envs: EnvVars;
+
+  get userMenuItems(): Array<MenuItem> {
+    return this.userInfo ? [{ label: 'Sign Out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout() }] : [];
+  }
+
+  get userInfo() {
+    return this.userInfoService.userInfo;
+  }
+
+  constructor(private userInfoService: UserInfoService, private envService: EnvironmentService) {
+
+  }
+
   ngOnInit() {
+      this.envs = this.envService.getEnvConfig();
+      this.userInfoService.fetchUserInfo();
       this.comingSoonTimerID = setTimeout(()=>{
         this.toggleComingSoonPopup();
       }, 2000);
@@ -35,5 +55,13 @@ export class AppComponent {
         this.toggleComingSoonPopup();
       }, 8000);
     }
+  }
+
+  login() {
+    this.userInfoService.login();
+  }
+
+  logout() {
+    this.userInfoService.logout();
   }
 }

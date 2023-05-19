@@ -9,7 +9,7 @@
 
                 <div class="details">
                     <div class="sequence_count">Valid No. of Sequences: {{numOfSeq}} Sequence(s) </div>
-                    <div class="sequence_time">Submission Time: {{statusResponse?.created_at | date:'short' }}</div>
+                    <div class="sequence_time" *ngIf="statusResponse?.created_at">Submission Time: {{statusResponse.created_at | date:'short' }}</div>
                 </div>
             </div>
 

@@ -4,11 +4,14 @@ FROM --platform=$BUILDPLATFORM node:16 as build
 # Set the working directory
 WORKDIR /usr/local/app
 
-# Add the source code to app
-COPY ./ /usr/local/app/
+# Add dependencies manifest to app
+COPY package.json package-lock.json ./
 
 # Install all the dependencies
 RUN npm install
+
+# Add the source code to app
+COPY . .
 
 # Generate the build of the application
 RUN npm run build
@@ -24,6 +27,10 @@ COPY --from=build /usr/local/app/dist/clean /usr/share/nginx/html
 
 # Copy the nginx config file, which has a try_files rule for SPA routing
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Run our envloader script before starting NGINX
+COPY entrypoint.sh /entrypoint.sh
+CMD [ "/entrypoint.sh" ]
 
 # Expose port 80
 EXPOSE 80

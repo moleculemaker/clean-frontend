@@ -9,6 +9,7 @@ import { switchMap } from 'rxjs/operators';
 import { PostResponse, PostSeqData, SingleSeqData, ExampleData, PostEmailData } from '../../../models';
 import { ResultsComponent } from '../results/results.component';
 import { NgHcaptchaService } from "ng-hcaptcha";
+import { UserInfoService } from "../../../services/userinfo.service";
 
 @Component({
   selector: 'app-configuration',
@@ -67,10 +68,16 @@ export class ConfigurationComponent {
     private httpClient: HttpClient,
     private trackingService: TrackingService,
     private hcaptchaService: NgHcaptchaService,
+    private userInfoService: UserInfoService,
     private ngZone: NgZone
   ) { }
 
   ngOnInit() {
+    // If user is logged in, populate email field automatically
+    const userInfo = this.userInfoService.userInfo;
+    if (userInfo) {
+      this.userEmail = userInfo.email;
+    }
     this.getExampleData();
     this.highTrafficMessage = [
       { severity: 'info', detail: 'Due to the overwhelming popularity of the CLEAN tool, we are temporarily unable to predict EC numbers for new sequences. As we increase our capacity, please feel free to explore the tool with the example data we have provided, and visit us again soon!' },
@@ -120,7 +127,13 @@ export class ConfigurationComponent {
         .subscribe( data => {
           this.router.navigate(['/results', data.jobId, '149']);
         });
+    } else if (this.userInfoService.userInfo) {
+      // User is logged in, send token cookie with request
+      this._sequenceService.getResponse(this.realSendData).subscribe((data) => {
+        this.router.navigate(['/results', data.jobId, String(this.seqNum)]);
+      });
     } else {
+      // User not logged in, send through hcaptcha
       this.hcaptchaService.verify().pipe(
         switchMap((data) => {
           this.realSendData.captcha_token = data;

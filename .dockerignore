@@ -1,0 +1,11 @@
+# Docker data
+docker-compose.yaml
+Dockerfile
+.env
+
+# Git metadata
+.git/
+
+# frontend dependencies + build output
+dist/
+node_modules/
