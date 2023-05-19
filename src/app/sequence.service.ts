@@ -61,10 +61,10 @@ export class SequenceService {
   }
 
   addEmail(userEmail: string): Observable<PostEmailResponse>{
-    return this.http.post<PostEmailResponse>(this._url  + '/mailing/add', {"email": userEmail});
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/add', {"email": userEmail}, { withCredentials: true });
   }
 
   removeEmail(userEmail: string): Observable<PostEmailResponse>{
-    return this.http.post<PostEmailResponse>(this._url  + '/mailing/delete', {"email": userEmail});
+    return this.http.post<PostEmailResponse>(this._url  + '/mailing/delete', {"email": userEmail}, { withCredentials: true });
   }
 }
