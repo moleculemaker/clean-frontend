@@ -23,11 +23,11 @@
                 <ng-container *ngIf="selectedInputMethod == 'copy_and_paste'">
                     <div class="panel_bar">
                         <h3>Sequences input</h3>
-                        
-                        <div class="buttons" *ngFor="let format of fileFormat">
+
+                        <!-- <div class="buttons" *ngFor="let format of fileFormat">
                             <p-radioButton name="format" [value]="format.value" [(ngModel)]="selectedfileFormat" [inputId]="format.label" (onClick)="submitValidate()"></p-radioButton>
                             <label [for]="format.label" class="label">{{format.label}}</label>
-                        </div>
+                        </div> -->
 
                         <!-- <p-selectButton [options]="fileFormat" [(ngModel)]="selectedfileFormat"
                             (onOptionClick)="submitValidate()">
@@ -35,7 +35,7 @@
                                 {{item.label}}
                             </ng-template>
                         </p-selectButton> -->
-                        
+
 
                         <div class="spacer"></div>
 
@@ -43,17 +43,17 @@
                             class="p-button-text p-button-plain p-button-xs"></button>
                     </div>
 
-
-                    <textarea *ngIf="selectedfileFormat == 'amino'" pInputTextarea [rows]="8" placeholder="Please enter enzyme amino acid sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
+                    <textarea pInputTextarea [rows]="8" placeholder="Please enter enzyme amino acid sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
+                    <!-- <textarea *ngIf="selectedfileFormat == 'amino'" pInputTextarea [rows]="8" placeholder="Please enter enzyme amino acid sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
                     <textarea *ngIf="selectedfileFormat == 'dna'" pInputTextarea [rows]="8" placeholder="Please enter enzyme DNA sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
-                    <textarea *ngIf="selectedfileFormat == 'ncbi'" pInputTextarea [rows]="8" placeholder="Please enter enzyme NCBI accession number." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidateNCBI()"></textarea>
+                    <textarea *ngIf="selectedfileFormat == 'ncbi'" pInputTextarea [rows]="8" placeholder="Please enter enzyme NCBI accession number." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidateNCBI()"></textarea> -->
 
                 </ng-container>
 
                 <ng-container *ngIf="selectedInputMethod == 'use_example'">
                     <div class="panel_bar">
                         <h3>Example</h3>
-                        
+
                         <!-- <div *ngFor="let example of exampleData">
                             <p-radioButton name="example" [value]="example.label" [(ngModel)]="selectedExample" [inputId]="example.label" (onClick)="selectExample()"></p-radioButton>
                             <label [for]="example.label" class="label">{{example.label}}</label>
