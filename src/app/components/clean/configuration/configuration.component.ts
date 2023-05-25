@@ -177,13 +177,14 @@ export class ConfigurationComponent {
   }
 
   isInvalidFasta(seq: string) {
-    if (this.selectedfileFormat == 'amino') {
-      return this.validAminoAcid.test(seq);
-    }
-    else if (this.selectedfileFormat == 'dna'){
-      return this.validDNA.test(seq);
-    }
-    return true;
+    return this.validAminoAcid.test(seq);
+    // if (this.selectedfileFormat == 'amino') {
+    //   return this.validAminoAcid.test(seq);
+    // }
+    // else if (this.selectedfileFormat == 'dna'){
+    //   return this.validDNA.test(seq);
+    // }
+    // return true;
   }
 
   enterEmail() {
