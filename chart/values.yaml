@@ -1,5 +1,6 @@
 ingress:
   hostname: clean.proxy.localhost
+  extraHosts: []
   tls: false
   annotations: {}
 
@@ -13,3 +14,4 @@ config:
 controller:
   image: moleculemaker/clean-frontend
 
+extraDeploy: []

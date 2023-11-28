@@ -12,6 +12,11 @@ spec:
   tls:
   - hosts:
     - {{ .Values.ingress.hostname }}
+{{- range $key, $value := .Values.ingress.extraHosts }}
+{{- range $value.hosts }}
+    - {{ . }}
+{{- end }}
+{{- end }}
     secretName: {{ .Values.ingress.hostname }}-tls
 {{- end }}
 {{- if .Values.ingress.ingressClassName }}
@@ -28,3 +33,15 @@ spec:
               number: 80
         path: /
         pathType: ImplementationSpecific
+{{- range $key, $value := .Values.ingress.extraHosts }}
+{{- range $value.hosts }}
+  - host: {{ . }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Release.Name }}
+            port:
+              number: 80
+{{- end }}
+{{- end }}
