@@ -13,9 +13,7 @@ spec:
   - hosts:
     - {{ .Values.ingress.hostname }}
 {{- range $key, $value := .Values.ingress.extraHosts }}
-{{- range $value }}
     - {{ . }}
-{{- end }}
 {{- end }}
     secretName: {{ .Values.ingress.hostname }}-tls
 {{- end }}
@@ -34,7 +32,6 @@ spec:
         path: /
         pathType: ImplementationSpecific
 {{- range $key, $value := .Values.ingress.extraHosts }}
-{{- range $value }}
   - host: {{ . }}
     http:
       paths:
@@ -43,5 +40,4 @@ spec:
             name: {{ .Release.Name }}
             port:
               number: 80
-{{- end }}
 {{- end }}
