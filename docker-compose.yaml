@@ -12,5 +12,5 @@ services:
     restart: unless-stopped
 
     volumes:
-     - ./assets/config/:/usr/share/nginx/html/assets/config:ro
+     - ./src/assets/config/:/usr/share/nginx/html/assets/config:ro
      #- ./dist/clean:/usr/share/nginx/html:ro
