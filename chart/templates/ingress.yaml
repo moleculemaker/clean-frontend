@@ -13,7 +13,7 @@ spec:
   - hosts:
     - {{ .Values.ingress.hostname }}
 {{- range $key, $value := .Values.ingress.extraHosts }}
-{{- range $value.hosts }}
+{{- range $value }}
     - {{ . }}
 {{- end }}
 {{- end }}
@@ -34,7 +34,7 @@ spec:
         path: /
         pathType: ImplementationSpecific
 {{- range $key, $value := .Values.ingress.extraHosts }}
-{{- range $value.hosts }}
+{{- range $value }}
   - host: {{ . }}
     http:
       paths:
