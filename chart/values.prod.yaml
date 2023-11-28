@@ -4,10 +4,10 @@ ingress:
   - clean.frontend.mmli1.ncsa.illinois.edu
   tls: true
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    cert-manager.io/cluster-issuer: "letsencrypt-production"
     kubernetes.io/tls-acme: "true"
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: alphasynthesis-prod-domain-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-clean-prod-domain-redirect@kubernetescrd"
 
 config:
   hostname: "https://jobmgr.mmli1.ncsa.illinois.edu"
@@ -17,7 +17,6 @@ config:
   userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
 
 extraDeploy:
-
 - apiVersion: traefik.containo.us/v1alpha1
   kind: Middleware
   metadata:
@@ -25,6 +24,6 @@ extraDeploy:
     namespace: alphasynthesis
   spec:
     redirectRegex:
-          regex: "^https://clean.frontend.mmli1.ncsa.illinois.edu/(.*)"
-          replacement: "https://clean.platform.moleculemaker.org/${1}"
-          permanent: true
+      regex: "^https://clean.frontend.mmli1.ncsa.illinois.edu/(.*)"
+      replacement: "https://clean.platform.moleculemaker.org/${1}"
+      permanent: true

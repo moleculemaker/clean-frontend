@@ -37,7 +37,7 @@ spec:
       paths:
       - backend:
           service:
-            name: {{ .Release.Name }}
+            name: {{ $.Release.Name }}
             port:
               number: 80
 {{- end }}
