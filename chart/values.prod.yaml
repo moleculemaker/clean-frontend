@@ -1,5 +1,5 @@
 ingress:
-  hostname: clean.frontend.mmli1.ncsa.illinois.edu
+  hostname: clean.platform.moleculemaker.org
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
@@ -9,8 +9,8 @@ ingress:
 config:
   hostname: "https://jobmgr.mmli1.ncsa.illinois.edu"
   basePath: "api/v1"
-  signInUrl: "https://mmli1.ncsa.illinois.edu/oauth2/start?rd=https%3A%2F%2Fclean.frontend.mmli1.ncsa.illinois.edu%2Fconfiguration"
-  signOutUrl: "https://mmli1.ncsa.illinois.edu/oauth2/sign_out?rd=https%3A%2F%2Fclean.frontend.mmli1.ncsa.illinois.edu%2Fconfiguration"
-  userInfoUrl: "https://mmli1.ncsa.illinois.edu/oauth2/userinfo"
+  signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fclean.platform.moleculemaker.org%2Fconfiguration"
+  signOutUrl: "https://auth.platform.moleculemaker.org/oauth2/sign_out?rd=https%3A%2F%2Fclean.platform.moleculemaker.org%2Fconfiguration"
+  userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
 
 
