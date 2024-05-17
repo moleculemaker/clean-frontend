@@ -13,7 +13,8 @@ export class EnvironmentService {
   async loadEnvConfig(configPath: string): Promise<void> {
     console.log('Loading environment config!');
     this.envConfig = await lastValueFrom(this.http.get<EnvVars>(configPath));
-    this.apiConfig.basePath = this.envConfig.hostname + this.envConfig.basePath
+    this.apiConfig.basePath = this.envConfig.hostname + this.envConfig.basePath;
+    this.apiConfig.withCredentials = true;
   }
 
   getEnvConfig(): EnvVars {
