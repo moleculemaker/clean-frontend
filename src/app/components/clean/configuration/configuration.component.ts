@@ -130,7 +130,7 @@ export class ConfigurationComponent {
     } else if (this.userInfoService.userInfo) {
       // User is logged in, send token cookie with request
       this._sequenceService.getResponse(this.realSendData).subscribe((data) => {
-        this.router.navigate(['/results', data.jobId, String(this.seqNum)]);
+        this.router.navigate(['/results', data.job_id, String(this.seqNum)]);
       });
     } else {
       // User not logged in, send through hcaptcha
@@ -139,11 +139,11 @@ export class ConfigurationComponent {
           this.realSendData.captcha_token = data;
           return this._sequenceService.getResponse(this.realSendData);
         })
-      ).subscribe(
-        (data) => {
-          this.router.navigate(['/results', data.jobId, String(this.seqNum)]);
+      ).subscribe({
+        next: (data) => {
+          this.router.navigate(['/results', data.job_id, String(this.seqNum)]);
         },
-        (error) => {
+        error: (error) => {
           // TODO replace this with a call to the message service, and display the correct error message
           this.ngZone.run(() => {
             console.error('Error getting contacts via subscribe() method:', error.error.message);
@@ -151,7 +151,7 @@ export class ConfigurationComponent {
             this.jobFailedMessage[0].detail = 'Job failed due to ' + error.error.message + '. Please try again, or click the feedback link at the bottom of the page to report a problem.'
           });
         }
-      );
+      });
     }
   }
 

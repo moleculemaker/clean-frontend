@@ -33,6 +33,7 @@ import { NgxMatomoRouterModule } from '@ngx-matomo/router';
 import { NgHcaptchaModule } from 'ng-hcaptcha';
 import { EnvironmentService } from "./services/environment.service";
 import { MenuModule } from "primeng/menu";
+import {ApiModule, Configuration} from "./api/mmli-backend/v1";
 
 const initAppFn = (envService: EnvironmentService) => {
   return () => envService.loadEnvConfig('/assets/config/envvars.json');
@@ -72,6 +73,7 @@ const initAppFn = (envService: EnvironmentService) => {
       siteId: 3,
       trackerUrl: 'https://matomo.mmli1.ncsa.illinois.edu/'
     }),
+    ApiModule.forRoot(() => new Configuration()),
     NgxMatomoRouterModule,
     NgHcaptchaModule.forRoot({
       siteKey: '0b1663cb-26b9-4e6f-bfa9-352bdd3aeb9f',

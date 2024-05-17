@@ -5,12 +5,13 @@ import { PollingResponseStatus, PollingResponseResult } from './models';
 import { switchMap, tap, share, retry, takeUntil } from 'rxjs/operators';
 import {EnvVars} from "./models/envvars";
 import {EnvironmentService} from "./services/environment.service";
+import {FilesService, Job, JobsService} from "./api/mmli-backend/v1";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ResultService {
-  private resuts$: Observable<PollingResponseStatus>;
+  private resuts$: Observable<Array<Job>>;
   private stopPolling = new Subject();
 
   private envs: EnvVars;
@@ -76,11 +77,16 @@ export class ResultService {
     ]
   };
 
-  constructor(private http: HttpClient, private envService: EnvironmentService) {
+  constructor(private http: HttpClient,
+              private envService: EnvironmentService,
+              private jobsApi: JobsService,
+              private filesApi: FilesService) {
+
     this.envs = this.envService.getEnvConfig();
     this.resuts$ = timer(1, 10000).pipe(
       switchMap((x) =>
-        this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
+        this.jobsApi.listJobsByTypeAndJobIdJobTypeJobsJobIdGet('clean', this.jobID)
+        //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
       retry(),
@@ -123,11 +129,12 @@ export class ResultService {
     this.stopPolling.next(1);
   }
 
-  getResponse(jobID: any): Observable<PollingResponseResult>{
+  getResponse(jobID: any): Observable<string>{
     this.jobID = jobID;
-    return this.http.post<PollingResponseResult>(this._url_result, {'jobId' : jobID}, { withCredentials: true }) //should return a jobID
+    //return this.http.post<PollingResponseResult>(this._url_result, {'jobId' : jobID}, { withCredentials: true }) //should return a jobID
+    return this.filesApi.getResultsBucketNameResultsJobIdGet('clean', this.jobID)
   }
-  getResult(jobID: any): Observable<PollingResponseStatus>{
+  getResult(jobID: any): Observable<Array<Job>>{
     this.jobID = jobID;
     return this.resuts$;
     // return this.http.post<PollingResponseStatus>(this._url_status, jobID);

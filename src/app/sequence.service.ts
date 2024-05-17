@@ -5,6 +5,7 @@ import { Observable, of, delay } from 'rxjs';
 import { PostResponse, PostSeqData, ExampleData, PostEmailResponse } from './models';
 import { EnvironmentService } from "./services/environment.service";
 import { EnvVars } from "./models/envvars";
+import {Job, JobsService} from "./api/mmli-backend/v1";
 
 @Injectable({
   providedIn: 'root'
@@ -30,16 +31,16 @@ export class SequenceService {
   private envs: EnvVars;
 
   get hostname() {
-    return this.envs?.hostname || 'https://jobmgr.mmli1.ncsa.illinois.edu';
+    return this.envs?.hostname || 'https://mmli.fastapi.mmli1.ncsa.illinois.edu';
   }
   get apiBasePath() {
-    return this.envs?.basePath || 'api/v1';
+    return this.envs?.basePath || '';
   }
   get _url(): string {
     return `${this.hostname}/${this.apiBasePath}`;
   }
 
-  constructor(private http: HttpClient, private envService: EnvironmentService) {
+  constructor(private http: HttpClient, private envService: EnvironmentService, private jobsApi: JobsService) {
     this.envs = this.envService.getEnvConfig();
   }
 
@@ -56,8 +57,12 @@ export class SequenceService {
   }
 
 
-  getResponse(sequenceData: PostSeqData): Observable<PostResponse>{
-    return this.http.post<PostResponse>(this._url + '/job/submit', sequenceData, { withCredentials: true }); //should return a jobID
+  getResponse(sequenceData: PostSeqData): Observable<Job>{
+    return this.jobsApi.createJobJobTypeJobsPost('clean', {
+      email: sequenceData.user_email,
+      job_info: JSON.stringify({ 'input_fasta': sequenceData.input_fasta })
+    });
+    //return this.http.post<PostResponse>(this._url + '/job/submit', sequenceData, { withCredentials: true }); //should return a jobID
   }
 
   addEmail(userEmail: string): Observable<PostEmailResponse>{
