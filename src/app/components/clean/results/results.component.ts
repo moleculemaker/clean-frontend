@@ -21,7 +21,7 @@ export class ResultsComponent {
   timeInterval: Subscription;
   contentLoaded: boolean = false;
   rows: PredictionRow[] = [];
-  getResponse: PollingResponseResult;
+  getResponse: SeqResult[];
   failedJob: boolean = false;
   jobID: string;
   sendJobID: string | undefined;
@@ -68,9 +68,9 @@ export class ResultsComponent {
 
   }
 
-  parseResult(): void {
+  parseResult(results: SeqResult[]): void {
     // this.jobID = this.getResponse.jobId;
-    this.getResponse.results.forEach((seq: SeqResult) => {
+    results.forEach((seq: SeqResult) => {
       let temp: PredictionRow = {
         sequence: '',
         ecNumbers: [],
@@ -131,11 +131,19 @@ export class ResultsComponent {
   getResult(): void {
     this.timeInterval = this._resultService.getResult(this.sendJobID)
       .subscribe(
-        data => {
-          console.log(data);
-          this.statusResponse = data;
-          if (this.statusResponse.status == 'completed' || this.statusResponse.status == 'failed') {
-            this._resultService.gotEndResult();
+        jobs => {
+          const firstMatch = jobs.find(() => true);
+          console.log(firstMatch);
+          if (firstMatch) {
+            this.statusResponse = {
+              status: firstMatch?.phase!,
+              jobId: firstMatch?.job_id!,
+              created_at: new Date(firstMatch?.time_created!).toISOString(),
+              url: ''
+            }
+            if (this.statusResponse.status == 'completed' || this.statusResponse.status == 'failed') {
+              this._resultService.gotEndResult();
+            }
           }
         },
         error => {
@@ -157,8 +165,8 @@ export class ResultsComponent {
       this._resultService.getResponse(this.sendJobID)
         .subscribe(
           data => {
-            this.getResponse = data;
-            this.parseResult();
+            const results = JSON.parse(data) as SeqResult[];
+            this.parseResult(results);
             this.contentLoaded = true;
           },
           error => {
@@ -257,7 +265,7 @@ export class ResultsComponent {
         // decending high -> low
         this.rows.forEach((element, index, array) => {
           let tempArray: any[] = [];
-          
+
           element['score'].forEach((element2, index2) => {
             tempArray.push([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
             // console.log([element['ecNumbers'][index2], element['score'][index2], element['level'][index2]]);
@@ -288,7 +296,7 @@ export class ResultsComponent {
         return event.order === -1 ? v2 - v1 : v1 - v2;
       });
     }
-    
+
   }
 
   copyAndPasteURL(): void {
