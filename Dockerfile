@@ -1,5 +1,5 @@
 # Use official node image as the base image
-FROM --platform=$BUILDPLATFORM node:16 as build
+FROM --platform=$BUILDPLATFORM node:16-slim AS build
 
 # Set the working directory
 WORKDIR /usr/local/app
@@ -8,7 +8,9 @@ WORKDIR /usr/local/app
 COPY package.json package-lock.json ./
 
 # Install all the dependencies
-RUN npm install
+RUN --mount=type=cache,target=/usr/local/app/.npm \
+  npm set cache /usr/local/app/.npm && \
+  npm install
 
 # Add the source code to app
 COPY . .

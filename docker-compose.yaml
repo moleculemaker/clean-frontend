@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   clean-frontend:
     image: moleculemaker/clean-frontend:staging
