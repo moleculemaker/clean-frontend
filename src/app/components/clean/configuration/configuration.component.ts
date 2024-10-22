@@ -130,6 +130,7 @@ export class ConfigurationComponent {
           this.router.navigate(['/results', data.jobId, '149']);
         });
     } else {
+      // By default, just submit the job (skip HCAPTCHA)
       let submission = this._sequenceService.getResponse(this.realSendData);
       if (this.userInfoService.userInfo) {
         // User is logged in (sends token cookie with request)
@@ -139,7 +140,7 @@ export class ConfigurationComponent {
         // User is not logged in
         // Check if we should prompt HCAPTCHA
         if (this.env.getEnvConfig().enableHCAPTCHA) {
-          // Verify HCAPTCHA
+          // Verify HCAPTCHA, then submit job
           submission = this.hcaptchaService.verify().pipe(
             switchMap((data) => {
                   return this._sequenceService.getResponse({
