@@ -9,6 +9,7 @@ import { switchMap } from 'rxjs/operators';
 import { PostResponse, PostSeqData, SingleSeqData, ExampleData, PostEmailData } from '../../../models';
 import { ResultsComponent } from '../results/results.component';
 import { NgHcaptchaService } from "ng-hcaptcha";
+import { EnvironmentService } from "../../../services/environment.service";
 import { UserInfoService } from "../../../services/userinfo.service";
 
 @Component({
@@ -69,6 +70,7 @@ export class ConfigurationComponent {
     private trackingService: TrackingService,
     private hcaptchaService: NgHcaptchaService,
     private userInfoService: UserInfoService,
+    private env: EnvironmentService,
     private ngZone: NgZone
   ) { }
 
@@ -127,19 +129,30 @@ export class ConfigurationComponent {
         .subscribe( data => {
           this.router.navigate(['/results', data.jobId, '149']);
         });
-    } else if (this.userInfoService.userInfo) {
-      // User is logged in, send token cookie with request
-      this._sequenceService.getResponse(this.realSendData).subscribe((data) => {
-        this.router.navigate(['/results', data.job_id, String(this.seqNum)]);
-      });
     } else {
-      // User not logged in, send through hcaptcha
-      this.hcaptchaService.verify().pipe(
-        switchMap((data) => {
-          this.realSendData.captcha_token = data;
-          return this._sequenceService.getResponse(this.realSendData);
-        })
-      ).subscribe({
+      let submission = this._sequenceService.getResponse(this.realSendData);
+      if (this.userInfoService.userInfo) {
+        // User is logged in (sends token cookie with request)
+        // Skip HCAPTCHA
+        // TODO: Anything else we need to do in this case?
+      } else {
+        // User is not logged in
+        // Check if we should prompt HCAPTCHA
+        if (this.env.getEnvConfig().enableHCAPTCHA) {
+          // Verify HCAPTCHA
+          submission = this.hcaptchaService.verify().pipe(
+            switchMap((data) => {
+                  return this._sequenceService.getResponse({
+                    ...this.realSendData,
+                    captcha_token: data
+                  });
+              })
+            )
+        }
+      }
+
+      // Submit user request (either with HCAPTCHA or without)
+      submission.subscribe({
         next: (data) => {
           this.router.navigate(['/results', data.job_id, String(this.seqNum)]);
         },
