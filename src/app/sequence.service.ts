@@ -6,6 +6,7 @@ import { PostResponse, PostSeqData, ExampleData, PostEmailResponse } from './mod
 import { EnvironmentService } from "./services/environment.service";
 import { EnvVars } from "./models/envvars";
 import {Job, JobsService} from "./api/mmli-backend/v1";
+import { TrackingService } from './tracking.service';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +41,12 @@ export class SequenceService {
     return `${this.hostname}/${this.apiBasePath}`;
   }
 
-  constructor(private http: HttpClient, private envService: EnvironmentService, private jobsApi: JobsService) {
+  constructor(
+    private http: HttpClient,
+    private envService: EnvironmentService,
+    private jobsApi: JobsService,
+    private trackingService: TrackingService
+  ) {
     this.envs = this.envService.getEnvConfig();
   }
 
@@ -58,6 +64,7 @@ export class SequenceService {
 
 
   getResponse(sequenceData: PostSeqData): Observable<Job>{
+    this.trackingService.trackJobSubmission(sequenceData);
     return this.jobsApi.createJobJobTypeJobsPost('clean', {
       email: sequenceData.user_email,
       job_info: JSON.stringify({ 'input_fasta': sequenceData.input_fasta })
