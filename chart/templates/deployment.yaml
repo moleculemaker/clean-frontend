@@ -20,7 +20,7 @@ spec:
           image: {{ .Values.controller.image }}
 
           env:
-   
+
           - name: JOB_MANAGER_API_HOSTNAME
             valueFrom:
               configMapKeyRef:
@@ -32,7 +32,7 @@ spec:
               configMapKeyRef:
                 name: {{ .Release.Name }}-config
                 key: basePath
- 
+
           - name: OAUTH_SIGNIN_URL
             valueFrom:
               configMapKeyRef:
@@ -51,6 +51,11 @@ spec:
                 name: {{ .Release.Name }}-config
                 key: userInfoUrl
 
+          - name: ENABLE_HCAPTCHA
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Name }}-config
+                key: enableHCAPTCHA
 
           ports:
             - containerPort: 80
