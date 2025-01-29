@@ -10,6 +10,8 @@
 import { Injectable } from '@angular/core';
 import { MatomoTracker } from '@ngx-matomo/tracker';
 
+import { PostSeqData } from './models';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +35,10 @@ export class TrackingService {
 
   trackSelectExampleData(exampleDataSet: string): void {
     this.tracker.trackEvent('Configuration', 'Select example data', exampleDataSet);
+  }
+
+  trackJobSubmission(postSeqData: PostSeqData): void {
+    this.tracker.trackEvent('Sequence Service', 'Create Job', 'Number of sequences', postSeqData.input_fasta.length);
   }
 }
 
