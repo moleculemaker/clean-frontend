@@ -139,7 +139,7 @@ export class ConfigurationComponent {
       } else {
         // User is not logged in
         // Check if we should prompt HCAPTCHA
-        if (this.env.getEnvConfig().enableHCAPTCHA) {
+        if (this.env.getEnvConfig().enableHCAPTCHA === "true") {
           // Verify HCAPTCHA, then submit job
           submission = this.hcaptchaService.verify().pipe(
             switchMap((data) => {

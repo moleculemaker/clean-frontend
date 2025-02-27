@@ -5,6 +5,6 @@
   "signInUrl": "${OAUTH_SIGNIN_URL}",
   "signOutUrl": "${OAUTH_SIGNOUT_URL}",
   "userInfoUrl": "${OAUTH_USERINFO_URL}",
-  "enableHCAPTCHA": ${ENABLE_HCAPTCHA}
+  "enableHCAPTCHA": "${ENABLE_HCAPTCHA}"
 }
 
