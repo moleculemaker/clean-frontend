@@ -50,8 +50,7 @@ export class ResultsComponent {
       { severity: 'error', detail: 'Job failed possibly due to incorrect input or intermittent issues. Please use the “Run a new Request” button above to try again, or click the feedback link at the bottom of the page to report a problem.'}
     ]
 
-    this.sendJobID = window.location.href.split('/').at(-2);
-    this.numOfSeq = Number(window.location.href.split('/').at(-1));
+    this.sendJobID = window.location.href.split('/').at(-1);
     if (this.sendJobID != 'price149') {
       this.getResult();
     }
@@ -141,6 +140,7 @@ export class ResultsComponent {
               created_at: new Date(firstMatch?.time_created!).toISOString(),
               url: ''
             }
+            this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
             if (this.statusResponse.status == 'completed' || this.statusResponse.status == 'failed') {
               this._resultService.gotEndResult();
             }
