@@ -137,7 +137,7 @@ export class ResultsComponent {
             this.statusResponse = {
               status: firstMatch?.phase!,
               jobId: firstMatch?.job_id!,
-              created_at: new Date(firstMatch?.time_created!).toISOString(),
+              created_at: new Date(firstMatch?.time_created! * 1000).toISOString(),
               url: ''
             }
             this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
