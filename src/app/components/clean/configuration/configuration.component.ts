@@ -127,7 +127,7 @@ export class ConfigurationComponent {
     if (this.selectedInputMethod == 'use_example') {
       this._sequenceService.getExampleResponse(this.selectedExample.label)
         .subscribe( data => {
-          this.router.navigate(['/results', data.jobId, '149']);
+          this.router.navigate(['/results', data.jobId]);
         });
     } else {
       // By default, just submit the job (skip HCAPTCHA)
@@ -139,7 +139,7 @@ export class ConfigurationComponent {
       } else {
         // User is not logged in
         // Check if we should prompt HCAPTCHA
-        if (this.env.getEnvConfig().enableHCAPTCHA) {
+        if (this.env.getEnvConfig().enableHCAPTCHA === "true") {
           // Verify HCAPTCHA, then submit job
           submission = this.hcaptchaService.verify().pipe(
             switchMap((data) => {
@@ -155,7 +155,7 @@ export class ConfigurationComponent {
       // Submit user request (either with HCAPTCHA or without)
       submission.subscribe({
         next: (data) => {
-          this.router.navigate(['/results', data.job_id, String(this.seqNum)]);
+          this.router.navigate(['/results', data.job_id]);
         },
         error: (error) => {
           // TODO replace this with a call to the message service, and display the correct error message

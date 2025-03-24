@@ -43,7 +43,16 @@
                             class="p-button-text p-button-plain p-button-xs"></button>
                     </div>
 
-                    <textarea pInputTextarea [rows]="8" placeholder="Please enter enzyme amino acid sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
+                    <textarea 
+                        pInputTextarea 
+                        [rows]="8" 
+                        [autoResize]="true"
+                        style="max-height: 360px; overflow-y: auto;"
+                        placeholder="Please enter enzyme amino acid sequence in FASTA format." 
+                        [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" 
+                        (input)="submitValidate()"
+                        [disabled]="selectedfileFormat == 'ncbi'"
+                    ></textarea>
                     <!-- <textarea *ngIf="selectedfileFormat == 'amino'" pInputTextarea [rows]="8" placeholder="Please enter enzyme amino acid sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
                     <textarea *ngIf="selectedfileFormat == 'dna'" pInputTextarea [rows]="8" placeholder="Please enter enzyme DNA sequence in FASTA format." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidate()"></textarea>
                     <textarea *ngIf="selectedfileFormat == 'ncbi'" pInputTextarea [rows]="8" placeholder="Please enter enzyme NCBI accession number." [(ngModel)]="sequenceData" #sequenceDataHtml="ngModel" (input)="submitValidateNCBI()"></textarea> -->
