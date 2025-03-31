@@ -62,7 +62,7 @@
 
         <div class="link">
 
-            <a href="https://docs.google.com/document/d/1zFk1Lb7EAhMdcRp2KN9eyWVQSTBnT2HRYm3UKfZt6CE/edit?usp=sharing"
+            <!-- <a href="https://docs.google.com/document/d/1zFk1Lb7EAhMdcRp2KN9eyWVQSTBnT2HRYm3UKfZt6CE/edit?usp=sharing"
                 target="_blank">
                 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -83,7 +83,11 @@
                         fill="#203A5A" />
                 </svg>
 
-                User Guide
+                Tutorial
+            </a> -->
+            <a class="flex items-center m-1 cursor-pointer" (click)="tutorialMenu.toggle($event)">
+                <p-menu #tutorialMenu [model]="tutorialMenuItems" [popup]="true" appendTo="body" [baseZIndex]="9999"></p-menu>
+                <i class="mr-1 pi pi-question-circle"></i> Tutorial
             </a>
         </div>
 

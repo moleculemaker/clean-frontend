@@ -23,6 +23,21 @@ export class AppComponent {
     return this.userInfo ? [{ label: 'Sign Out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout() }] : [];
   }
 
+  get tutorialMenuItems(): Array<MenuItem> {
+    return [
+      {
+        label: "PDF Document",
+        icon: "pi pi-arrow-up-right",
+        command: () => window.open("https://docs.google.com/document/d/1zFk1Lb7EAhMdcRp2KN9eyWVQSTBnT2HRYm3UKfZt6CE/edit?usp=sharing", "_blank"),
+      },
+      {
+        label: "Video Demo",
+        icon: "pi pi-arrow-up-right",
+        command: () => window.open("https://youtu.be/ULHhALqr8h4", "_blank"),
+      },
+    ];
+  }
+
   get userInfo() {
     return this.userInfoService.userInfo;
   }
