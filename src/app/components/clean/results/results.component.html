@@ -55,12 +55,14 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                             <i class="pi pi-search"></i>
                             <input pInputTextarea type="text" (input)="table.filterGlobal($any($event.target).value, 'contains')" placeholder="Identifier / EcNumbers" />
                         </span> -->
-                        <button pButton label="Filter" icon="pi pi-search" class="p-button-outlined" 
-                            (click)="filterResult()"></button>
-                        
+                        <div class="action_set">
+                            <button pButton label="Filter" icon="pi pi-search" class="p-button-outlined" 
+                                (click)="filterResult()"></button>
+                            
 
-                        <button pButton label="Download Results" icon="pi pi-download" class="p-button-sm"
-                            (click)="downloadResult()"></button>
+                            <button pButton label="Download Results" icon="pi pi-download" class="p-button-sm"
+                                (click)="downloadResult()"></button>
+                        </div>
                         
                     </div>
                 </ng-template>
@@ -83,7 +85,7 @@ turned this off, since only totalRecords appears to be accessible from the #tabl
                             <!-- <p-columnFilter type="text" field="ecNumbers"></p-columnFilter> -->
                             <span class="p-input-icon-left ml-auto">
                             <i class="pi pi-search"></i>
-                            <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'ecNumbers', 'contains')" placeholder="EcNumbers"/>
+                            <input pInputTextarea type="text" (input)="table.filter($any($event.target).value, 'ecNumbers', 'contains')" placeholder="EC Number"/>
                             </span>
                         </th>
                         <th>

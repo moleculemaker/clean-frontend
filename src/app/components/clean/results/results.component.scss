@@ -129,6 +129,11 @@ a:link, a:visited, a:active {
     h3 {
         margin: 0px;
     }
+
+    .action_set {
+        display: flex;
+        gap: $padding;
+    }
 }
 
 .failJob {
