@@ -1,17 +1,22 @@
 ingress:
-  hostname: clean.platform.moleculemaker.org
+  hostname: clean.platform.ibiofoundry.illinois.edu
   extraHosts:
   - clean.frontend.mmli1.ncsa.illinois.edu
+  - clean.platform.moleculemaker.org
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-production"
     kubernetes.io/tls-acme: "true"
     traefik.ingress.kubernetes.io/router.tls: "true"
-    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-clean-prod-domain-redirect@kubernetescrd"
+    traefik.ingress.kubernetes.io/router.middlewares: "alphasynthesis-clean-prod-domain-redirect@kubernetescrd,alphasynthesis-clean-prod-domain-redirect-ibiofoundry@kubernetescrd"
 
 config:
+  # TODO: add *.platform.ibiofoundry.illinois.edu to CORS
   hostname: "https://mmli.fastapi.mmli1.ncsa.illinois.edu"
   basePath: ""
+
+  # TODO: existing auth server won't work for ibiofoundry.illinois.edu - this will need a custom OAuth2 Proxy deployment
+  # TODO: is there a more generic way to handle this?
   signInUrl: "https://auth.platform.moleculemaker.org/oauth2/start?rd=https%3A%2F%2Fclean.platform.moleculemaker.org%2Fconfiguration"
   signOutUrl: "https://auth.platform.moleculemaker.org/oauth2/sign_out?rd=https%3A%2F%2Fclean.platform.moleculemaker.org%2Fconfiguration"
   userInfoUrl: "https://auth.platform.moleculemaker.org/oauth2/userinfo"
@@ -26,5 +31,16 @@ extraDeploy:
   spec:
     redirectRegex:
       regex: "^https://clean.frontend.mmli1.ncsa.illinois.edu/(.*)"
-      replacement: "https://clean.platform.moleculemaker.org/${1}"
+      replacement: "https://clean.platform.ibiofoundry.illinois.edu/${1}"
+      permanent: true
+      
+- apiVersion: traefik.io/v1alpha1
+  kind: Middleware
+  metadata:
+    name: clean-prod-domain-redirect-ibiofoundry
+    namespace: alphasynthesis
+  spec:
+    redirectRegex:
+      regex: "^https://clean.platform.moleculemaker.org/(.*)"
+      replacement: "https://clean.platform.ibiofoundry.illinois.edu/${1}"
       permanent: true
