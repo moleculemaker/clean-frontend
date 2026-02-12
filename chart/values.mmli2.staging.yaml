@@ -1,5 +1,7 @@
 ingress:
   hostname: clean.frontend.staging.mmli2.ncsa.illinois.edu
+  extraHosts:
+  - clean.frontend.staging.mmli1.ncsa.illinois.edu
   tls: true
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
