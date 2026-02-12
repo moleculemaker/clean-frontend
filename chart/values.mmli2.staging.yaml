@@ -29,6 +29,6 @@ extraDeploy:
     namespace: staging
   spec:
     redirectRegex:
-      regex: "^https://clean\.frontend\.staging\.mmli\d\.ncsa\.illinois\.edu\/(.*)"
-      replacement: "https://clean.frontend.staging.mmli2.ncsa.illinois.edu/${1}"
+      regex: "^https:\\/\\/clean\\.frontend\\.staging\\.mmli\\d\\.ncsa\\.illinois\\.edu(\\/.*)"
+      replacement: "https://clean.frontend.staging.mmli2.ncsa.illinois.edu${1}"
       permanent: true
