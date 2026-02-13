@@ -71,7 +71,7 @@ const initAppFn = (envService: EnvironmentService) => {
     DropdownModule,
     NgxMatomoTrackerModule.forRoot({
       siteId: 3,
-      trackerUrl: 'https://matomo.mmli1.ncsa.illinois.edu/'
+      trackerUrl: 'https://matomo.mmli2.ncsa.illinois.edu/'
     }),
     ApiModule.forRoot(() => new Configuration()),
     NgxMatomoRouterModule,
