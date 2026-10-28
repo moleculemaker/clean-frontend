@@ -142,7 +142,7 @@ export class ResultsComponent {
               url: ''
             }
             this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
-            if (this.statusResponse.status == 'completed' || this.statusResponse.status == JobStatus.Error) {
+            if (this.statusResponse.status == JobStatus.Completed || this.statusResponse.status == JobStatus.Error) {
               this._resultService.gotEndResult();
             }
           }

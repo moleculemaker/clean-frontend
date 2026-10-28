@@ -1,7 +1,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EnvironmentService } from '../../../services/environment.service';
-import { ApiModule, Configuration } from '../../../api/mmli-backend/v1';
+import { ApiModule, Configuration, Job, JobStatus } from '../../../api/mmli-backend/v1';
 import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -11,7 +11,6 @@ import { TableModule } from 'primeng/table';
 
 import { ResultsComponent } from './results.component';
 import { ResultService } from 'src/app/result.service';
-import { Job, JobStatus } from 'src/app/api/mmli-backend/v1';
 
 describe('ResultsComponent', () => {
   let component: ResultsComponent;
