@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { Message, SortEvent } from 'primeng/api';
 
 import { PredictionRow, PollingResponseResult, PollingResponseStatus, SingleSeqResult, SeqResult } from '../../../models';
+import { JobStatus } from '../../../api/mmli-backend/v1';
 
 
 
@@ -141,7 +142,7 @@ export class ResultsComponent {
               url: ''
             }
             this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
-            if (this.statusResponse.status == 'completed' || this.statusResponse.status == 'failed') {
+            if (this.statusResponse.status == 'completed' || this.statusResponse.status == JobStatus.Error) {
               this._resultService.gotEndResult();
             }
           }
@@ -150,7 +151,7 @@ export class ResultsComponent {
           console.error('Error getting contacts via subscribe() method:', error);
         },
         () => {
-          if (this.statusResponse.status == 'failed') {
+          if (this.statusResponse.status == JobStatus.Error) {
             this.failedJob = true;
           }
           this.getResponseResult();
