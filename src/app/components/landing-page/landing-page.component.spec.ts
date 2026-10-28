@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { InputTextareaModule } from 'primeng/inputtextarea';
 
 import { LandingPageComponent } from './landing-page.component';
 
