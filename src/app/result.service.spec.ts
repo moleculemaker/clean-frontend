@@ -36,4 +36,17 @@ describe('ResultService', () => {
     subscription.unsubscribe();
     discardPeriodicTasks();
   }));
+
+  it('surfaces the error to the subscriber when status requests keep failing', fakeAsync(() => {
+    spyOn(TestBed.inject(JobsService), 'listJobsByTypeAndJobIdJobTypeJobsJobIdGet')
+      .and.returnValue(throwError(() => new Error('404')));
+    const onError = jasmine.createSpy('onError');
+    const subscription = service.getResult('abc').subscribe({ error: onError });
+
+    tick(10 * 60 * 1000);
+    expect(onError).toHaveBeenCalled();
+
+    subscription.unsubscribe();
+    discardPeriodicTasks();
+  }));
 });

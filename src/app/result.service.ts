@@ -89,7 +89,7 @@ export class ResultService {
         //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
-      retry({ delay: 10000 }),
+      retry({ count: 5, delay: 10000, resetOnSuccess: true }),
       takeUntil(this.stopPolling)
     );
   }

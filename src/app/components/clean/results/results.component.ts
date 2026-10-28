@@ -4,7 +4,7 @@ import { ResultService } from 'src/app/result.service';
 import { interval } from "rxjs/internal/observable/interval";
 import { Subscription } from 'rxjs';
 import { startWith, switchMap } from "rxjs/operators";
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Message, SortEvent } from 'primeng/api';
 
 import { PredictionRow, PollingResponseResult, PollingResponseStatus, SingleSeqResult, SeqResult } from '../../../models';
@@ -20,6 +20,7 @@ import { JobStatus } from '../../../api/mmli-backend/v1';
 export class ResultsComponent {
   // subscribe to result service to get the predictionRow. after receive, set contentLoaded to false.
   timeInterval: Subscription;
+  routeParams: Subscription;
   contentLoaded: boolean = false;
   rows: PredictionRow[] = [];
   getResponse: SeqResult[];
@@ -38,7 +39,7 @@ export class ResultsComponent {
   enableFilter: boolean = false;
   levels: string[] = ['Low', 'Medium', 'High'];
 
-  constructor(private router: Router, private _resultService: ResultService, private httpClient: HttpClient) {
+  constructor(private router: Router, private route: ActivatedRoute, private _resultService: ResultService, private httpClient: HttpClient) {
 
   }
 
@@ -51,7 +52,20 @@ export class ResultsComponent {
       { severity: 'error', detail: 'Job failed possibly due to incorrect input or intermittent issues. Please use the “Run a new Request” button above to try again, or click the feedback link at the bottom of the page to report a problem.'}
     ]
 
-    this.sendJobID = window.location.href.split('/').at(-1);
+    // The router reuses this component when navigating between jobs, so reload on every id change.
+    this.routeParams = this.route.paramMap.subscribe(params => {
+      this.timeInterval?.unsubscribe();
+      this.contentLoaded = false;
+      this.rows = [];
+      this.filteredResult = [];
+      this.failedJob = false;
+      this.useExample = false;
+      this.sendJobID = params.get('id') ?? undefined;
+      this.loadJob();
+    });
+  }
+
+  loadJob(): void {
     if (this.sendJobID != 'price149') {
       this.getResult();
     }
@@ -65,7 +79,6 @@ export class ResultsComponent {
       this.useExample = true;
       this.getExampleResult();
     }
-
   }
 
   parseResult(results: SeqResult[]): void {
@@ -144,14 +157,23 @@ export class ResultsComponent {
             if (this.statusResponse.status == JobStatus.Completed || this.statusResponse.status == JobStatus.Error) {
               this._resultService.gotEndResult();
             }
-            this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
+            if (firstMatch.job_info) {
+              this.numOfSeq = JSON.parse(firstMatch.job_info).input_fasta.length;
+            }
+          }
+          else {
+            // No job with this id.
+            this.failedJob = true;
+            this._resultService.gotEndResult();
           }
         },
         error => {
           console.error('Error getting contacts via subscribe() method:', error);
+          this.failedJob = true;
+          this.contentLoaded = true;
         },
         () => {
-          if (this.statusResponse.status == JobStatus.Error) {
+          if (this.statusResponse?.status == JobStatus.Error) {
             this.failedJob = true;
           }
           this.getResponseResult();
@@ -316,7 +338,8 @@ export class ResultsComponent {
   }
 
   ngOnDestroy(): void {
-    this.timeInterval.unsubscribe();
+    this.routeParams.unsubscribe();
+    this.timeInterval?.unsubscribe();
   }
 
 }

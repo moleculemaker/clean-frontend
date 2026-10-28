@@ -1,10 +1,11 @@
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EnvironmentService } from '../../../services/environment.service';
 import { ApiModule, Configuration, Job, JobStatus } from '../../../api/mmli-backend/v1';
 import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { config, of, Subject, takeUntil } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
@@ -19,7 +20,10 @@ describe('ResultsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ TableModule, HttpClientTestingModule, ApiModule.forRoot(() => new Configuration()) ],
-      providers: [ EnvironmentService ],
+      providers: [
+        EnvironmentService,
+        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ id: 'abc' })) } },
+      ],
       schemas: [ NO_ERRORS_SCHEMA ],
       declarations: [ ResultsComponent ]
     })
@@ -62,6 +66,7 @@ describe('ResultsComponent job status polling', () => {
       providers: [
         { provide: ResultService, useValue: resultService },
         { provide: Router, useValue: {} },
+        { provide: ActivatedRoute, useValue: { paramMap: of(convertToParamMap({ id: 'abc' })) } },
         { provide: HttpClient, useValue: {} },
       ],
       schemas: [ NO_ERRORS_SCHEMA ],
@@ -92,7 +97,7 @@ describe('ResultsComponent job status polling', () => {
       fixture.detectChanges();
       flush();
 
-      expect(config.onUnhandledError).toHaveBeenCalled();
+      expect(config.onUnhandledError).not.toHaveBeenCalled();
       expect(resultService.gotEndResult).toHaveBeenCalled();
       expect(polls.observed).toBeFalse();
       expect(fixture.componentInstance.failedJob).toBeTrue();
@@ -118,4 +123,77 @@ describe('ResultsComponent job status polling', () => {
     expect(resultService.gotEndResult).not.toHaveBeenCalled();
     expect(polls.observed).toBeTrue();
   });
+
+  it('does not throw when a processing job has no job_info', fakeAsync(() => {
+    const onUnhandledError = config.onUnhandledError;
+    config.onUnhandledError = jasmine.createSpy('onUnhandledError');
+    try {
+      polls.next([{ ...job(JobStatus.Processing), job_info: undefined }]);
+      flush();
+
+      expect(config.onUnhandledError).not.toHaveBeenCalled();
+    } finally {
+      config.onUnhandledError = onUnhandledError;
+    }
+  }));
+
+  it('shows the failure message when status polling errors', () => {
+    polls.error(new Error('404'));
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.failedJob).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
+  });
+
+  it('stops polling when the component is destroyed', () => {
+    polls.next([job(JobStatus.Processing)]);
+    fixture.destroy();
+
+    expect(polls.observed).toBeFalse();
+  });
+
+  it('stops polling and shows the failure message when the job is not found', () => {
+    polls.next([]);
+    fixture.detectChanges();
+
+    expect(polls.observed).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
+  });
+});
+
+describe('ResultsComponent navigation between jobs', () => {
+  @Component({ template: '<router-outlet></router-outlet>' })
+  class HostComponent {}
+
+  let resultService: jasmine.SpyObj<ResultService>;
+
+  beforeEach(async () => {
+    resultService = jasmine.createSpyObj<ResultService>('ResultService', ['getResult', 'gotEndResult', 'getResponse']);
+    resultService.getResult.and.returnValue(new Subject<Job[]>());
+
+    await TestBed.configureTestingModule({
+      imports: [ RouterTestingModule.withRoutes([{ path: 'results/:id', component: ResultsComponent }]) ],
+      declarations: [ HostComponent, ResultsComponent ],
+      providers: [
+        { provide: ResultService, useValue: resultService },
+        { provide: HttpClient, useValue: {} },
+      ],
+      schemas: [ NO_ERRORS_SCHEMA ],
+    })
+    .compileComponents();
+  });
+
+  it('loads the new job when navigating from one job\'s results to another', fakeAsync(() => {
+    const fixture = TestBed.createComponent(HostComponent);
+    const router = TestBed.inject(Router);
+
+    router.navigate(['/results', 'A']);
+    flush();
+    fixture.detectChanges();
+    router.navigate(['/results', 'B']);
+    flush();
+    fixture.detectChanges();
+
+    expect(resultService.getResult).toHaveBeenCalledTimes(2);
+  }));
 });
