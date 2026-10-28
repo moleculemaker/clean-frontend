@@ -137,6 +137,23 @@ describe('ResultsComponent job status polling', () => {
     }
   }));
 
+  it('stops polling and shows the failure message when the job has no phase', () => {
+    polls.next([{ ...job(JobStatus.Processing), phase: undefined }]);
+    fixture.detectChanges();
+
+    expect(polls.observed).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
+  });
+
+  it('stops polling and shows the failure message when the job is canceled', () => {
+    // The backend's JobStatus has 'canceled'; the generated client enum does not.
+    polls.next([job('canceled' as JobStatus)]);
+    fixture.detectChanges();
+
+    expect(polls.observed).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
+  });
+
   it('shows the failure message when status polling errors', () => {
     polls.error(new Error('404'));
     fixture.detectChanges();

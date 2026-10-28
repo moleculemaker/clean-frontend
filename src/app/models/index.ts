@@ -54,7 +54,7 @@ export interface PostEmailData {
 export interface PollingResponseStatus {
   jobId: string;
   url: string;
-  status: JobStatus;
+  status?: JobStatus;
   created_at: string;
 }
 

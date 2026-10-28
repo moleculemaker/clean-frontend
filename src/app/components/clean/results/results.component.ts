@@ -149,12 +149,15 @@ export class ResultsComponent {
           console.log(firstMatch);
           if (firstMatch) {
             this.statusResponse = {
-              status: firstMatch?.phase!,
+              status: firstMatch.phase,
               jobId: firstMatch?.job_id!,
               created_at: new Date(firstMatch?.time_created! * 1000).toISOString(),
               url: ''
             }
-            if (this.statusResponse.status == JobStatus.Completed || this.statusResponse.status == JobStatus.Error) {
+            // Any other phase is final, including a missing one or one the generated enum
+            // lacks (the backend also has 'canceled').
+            if (firstMatch.phase != JobStatus.Queued && firstMatch.phase != JobStatus.Processing) {
+              this.failedJob = firstMatch.phase != JobStatus.Completed;
               this._resultService.gotEndResult();
             }
             if (firstMatch.job_info) {
@@ -173,9 +176,6 @@ export class ResultsComponent {
           this.contentLoaded = true;
         },
         () => {
-          if (this.statusResponse?.status == JobStatus.Error) {
-            this.failedJob = true;
-          }
           this.getResponseResult();
         });
   }
