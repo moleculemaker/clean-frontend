@@ -59,7 +59,7 @@ export class ResultsComponent {
       this.statusResponse = {
         jobId: "price149",
         url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-        status: "completed",
+        status: JobStatus.Completed,
         created_at: String(Date.now()),
       };
       this.useExample = true;
@@ -141,10 +141,10 @@ export class ResultsComponent {
               created_at: new Date(firstMatch?.time_created! * 1000).toISOString(),
               url: ''
             }
-            this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
             if (this.statusResponse.status == JobStatus.Completed || this.statusResponse.status == JobStatus.Error) {
               this._resultService.gotEndResult();
             }
+            this.numOfSeq = JSON.parse(firstMatch.job_info!).input_fasta.length;
           }
         },
         error => {

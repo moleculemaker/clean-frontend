@@ -3,9 +3,9 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EnvironmentService } from '../../../services/environment.service';
 import { ApiModule, Configuration, Job, JobStatus } from '../../../api/mmli-backend/v1';
 import { HttpClient } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { of, Subject, takeUntil } from 'rxjs';
+import { config, of, Subject, takeUntil } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 
@@ -46,7 +46,7 @@ describe('ResultsComponent job status polling', () => {
     phase,
     time_created: 0,
     job_info: JSON.stringify({ input_fasta: ['>seq1'] }),
-  } as Job);
+  });
 
   beforeEach(async () => {
     polls = new Subject<Job[]>();
@@ -82,6 +82,24 @@ describe('ResultsComponent job status polling', () => {
     expect(resultService.getResponse).not.toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
   });
+
+  it('stops polling for an errored job even when job_info is missing', fakeAsync(() => {
+    // RxJS reports errors thrown in a next handler here, on a timeout, instead of ending the subscription.
+    const onUnhandledError = config.onUnhandledError;
+    config.onUnhandledError = jasmine.createSpy('onUnhandledError');
+    try {
+      polls.next([{ ...job(JobStatus.Error), job_info: undefined }]);
+      fixture.detectChanges();
+      flush();
+
+      expect(config.onUnhandledError).toHaveBeenCalled();
+      expect(resultService.gotEndResult).toHaveBeenCalled();
+      expect(polls.observed).toBeFalse();
+      expect(fixture.componentInstance.failedJob).toBeTrue();
+    } finally {
+      config.onUnhandledError = onUnhandledError;
+    }
+  }));
 
   it('stops polling and fetches results when the job completes', () => {
     polls.next([job(JobStatus.Completed)]);

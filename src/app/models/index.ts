@@ -61,7 +61,7 @@ export interface PollingResponseStatus {
 export interface PollingResponseResult {
   jobId: string;
   url: string;
-  status: string;
+  status: JobStatus;
   created_at: string;
   results: SeqResult[];
 }

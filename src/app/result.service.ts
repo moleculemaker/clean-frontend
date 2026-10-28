@@ -5,7 +5,7 @@ import { PollingResponseStatus, PollingResponseResult } from './models';
 import { switchMap, tap, share, retry, takeUntil } from 'rxjs/operators';
 import {EnvVars} from "./models/envvars";
 import {EnvironmentService} from "./services/environment.service";
-import {FilesService, Job, JobsService} from "./api/mmli-backend/v1";
+import {FilesService, Job, JobStatus, JobsService} from "./api/mmli-backend/v1";
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class ResultService {
   private dummyRunningResult: PollingResponseResult = {
     jobId: "1",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "executing",
+    status: JobStatus.Processing,
     created_at: "2020-01-01 10:10:10",
     results: []
   };
@@ -41,7 +41,7 @@ export class ResultService {
   private dummyFailedResult: PollingResponseResult = {
     jobId: "2",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "failed",
+    status: JobStatus.Error,
     created_at: "2020-01-01 10:10:10",
     results: []
   };
@@ -49,7 +49,7 @@ export class ResultService {
   private dummyCompleteResult: PollingResponseResult = {
     jobId: "1",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "completed",
+    status: JobStatus.Completed,
     created_at: "2020-01-01 10:10:10",
     results: [
       {
@@ -89,7 +89,7 @@ export class ResultService {
         //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
-      retry(),
+      retry({ delay: 10000 }),
       takeUntil(this.stopPolling)
     );
   }
