@@ -1,3 +1,5 @@
+import { JobStatus } from '../api/mmli-backend/v1';
+
 export interface PredictionRow {
   sequence: string;
   ecNumbers: string[];
@@ -52,14 +54,14 @@ export interface PostEmailData {
 export interface PollingResponseStatus {
   jobId: string;
   url: string;
-  status: string;
+  status?: JobStatus;
   created_at: string;
 }
 
 export interface PollingResponseResult {
   jobId: string;
   url: string;
-  status: string;
+  status: JobStatus;
   created_at: string;
   results: SeqResult[];
 }
