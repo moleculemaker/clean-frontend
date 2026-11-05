@@ -193,7 +193,11 @@ export class ResultsComponent {
             this.contentLoaded = true;
           },
           error => {
+            // A completed job can still have no results (e.g. a 404 when the output file is
+            // missing). Show the failure message instead of leaving the loader up forever.
             console.error('Error getting contacts via POST resut method:', error);
+            this.failedJob = true;
+            this.contentLoaded = true;
           });
     }
   }

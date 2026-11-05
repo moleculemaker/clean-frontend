@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { config, of, Subject, takeUntil } from 'rxjs';
+import { config, of, Subject, takeUntil, throwError } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 
@@ -115,6 +115,19 @@ describe('ResultsComponent job status polling', () => {
     expect(fixture.componentInstance.failedJob).toBeFalse();
     expect(resultService.getResponse).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('.failJob')).toBeNull();
+  });
+
+  it('shows the failure message when a completed job has no results', () => {
+    // The backend answers 404 when a completed CLEAN job has no _maxsep.csv.
+    resultService.getResponse.and.returnValue(throwError(() => new Error('404')));
+
+    polls.next([job(JobStatus.Completed)]);
+    fixture.detectChanges();
+
+    expect(resultService.getResponse).toHaveBeenCalled();
+    expect(fixture.componentInstance.failedJob).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.loader')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.failJob')).not.toBeNull();
   });
 
   it('keeps polling while the job is processing', () => {
