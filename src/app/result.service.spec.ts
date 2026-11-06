@@ -61,6 +61,18 @@ describe('ResultService', () => {
     }));
   }
 
+  // From review: the generated client throws a plain Error, before any request, when there's no id.
+  it('surfaces the error when there is no job id (the bare /results route)', fakeAsync(() => {
+    const onError = jasmine.createSpy('onError');
+    const subscription = service.getResult(undefined).subscribe({ error: onError });
+
+    tick(1);
+    expect(onError).toHaveBeenCalled();
+
+    subscription.unsubscribe();
+    discardPeriodicTasks();
+  }));
+
   it('surfaces a client error to the subscriber without retrying', fakeAsync(() => {
     const listJobs = spyOn(TestBed.inject(JobsService), 'listJobsByTypeAndJobIdJobTypeJobsJobIdGet')
       .and.returnValue(throwError(() => httpError(404)));
