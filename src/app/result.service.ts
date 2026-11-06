@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, delay, timer, Subscription, Subject } from 'rxjs';
+import { Observable, of, delay, timer, Subscription, Subject, throwError } from 'rxjs';
 import { PollingResponseStatus, PollingResponseResult } from './models';
 import { switchMap, tap, share, retry, takeUntil } from 'rxjs/operators';
 import {EnvVars} from "./models/envvars";
@@ -89,7 +89,14 @@ export class ResultService {
         //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
-      retry({ count: 5, delay: 10000, resetOnSuccess: true }),
+      // Keep polling through an outage (network errors and 5xx), however long it lasts:
+      // the job may still be running. A 4xx won't fix itself, so it ends polling and the
+      // page shows the failure message. An unknown job id is a 200 with [], not a 404.
+      retry({
+        delay: (error) => error instanceof HttpErrorResponse && error.status >= 400 && error.status < 500
+          ? throwError(() => error)
+          : timer(10000),
+      }),
       takeUntil(this.stopPolling)
     );
   }
