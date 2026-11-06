@@ -1,11 +1,11 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, delay, timer, Subscription, Subject } from 'rxjs';
+import { Observable, of, delay, timer, Subscription, Subject, throwError } from 'rxjs';
 import { PollingResponseStatus, PollingResponseResult } from './models';
 import { switchMap, tap, share, retry, takeUntil } from 'rxjs/operators';
 import {EnvVars} from "./models/envvars";
 import {EnvironmentService} from "./services/environment.service";
-import {FilesService, Job, JobsService} from "./api/mmli-backend/v1";
+import {FilesService, Job, JobStatus, JobsService} from "./api/mmli-backend/v1";
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class ResultService {
   private dummyRunningResult: PollingResponseResult = {
     jobId: "1",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "executing",
+    status: JobStatus.Processing,
     created_at: "2020-01-01 10:10:10",
     results: []
   };
@@ -41,7 +41,7 @@ export class ResultService {
   private dummyFailedResult: PollingResponseResult = {
     jobId: "2",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "failed",
+    status: JobStatus.Error,
     created_at: "2020-01-01 10:10:10",
     results: []
   };
@@ -49,7 +49,7 @@ export class ResultService {
   private dummyCompleteResult: PollingResponseResult = {
     jobId: "1",
     url: "mmli.clean.com/jobId/b01f8a6b-2f3e-4160-8f5d-c9a2c5eead78",
-    status: "completed",
+    status: JobStatus.Completed,
     created_at: "2020-01-01 10:10:10",
     results: [
       {
@@ -89,7 +89,18 @@ export class ResultService {
         //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
-      retry(),
+      // Keep polling through a transient failure (a network error, status 0, or a 408, 429 or
+      // 5xx, which a proxy in front of the backend can also send), however long it lasts: the
+      // job may still be running. Anything else won't fix itself, so it ends polling and the
+      // page shows the failure message. That includes other 4xx and the plain Error the
+      // generated client throws when there's no job id (the bare /results route). An unknown
+      // job id is a 200 with [], not a 404.
+      retry({
+        delay: (error) => error instanceof HttpErrorResponse
+            && (error.status === 0 || error.status === 408 || error.status === 429 || error.status >= 500)
+          ? timer(10000)
+          : throwError(() => error),
+      }),
       takeUntil(this.stopPolling)
     );
   }
