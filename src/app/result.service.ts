@@ -89,13 +89,15 @@ export class ResultService {
         //this.http.post<PollingResponseResult>(this._url_status, {'jobId' : this.jobID}, { withCredentials: true })
         // this.tempSelectResult()
       ),
-      // Keep polling through an outage (a network error, status 0, or a 5xx), however long it
-      // lasts: the job may still be running. Anything else won't fix itself, so it ends
-      // polling and the page shows the failure message. That includes a 4xx and the plain
-      // Error the generated client throws when there's no job id (the bare /results route).
-      // An unknown job id is a 200 with [], not a 404.
+      // Keep polling through a transient failure (a network error, status 0, or a 408, 429 or
+      // 5xx, which a proxy in front of the backend can also send), however long it lasts: the
+      // job may still be running. Anything else won't fix itself, so it ends polling and the
+      // page shows the failure message. That includes other 4xx and the plain Error the
+      // generated client throws when there's no job id (the bare /results route). An unknown
+      // job id is a 200 with [], not a 404.
       retry({
-        delay: (error) => error instanceof HttpErrorResponse && (error.status === 0 || error.status >= 500)
+        delay: (error) => error instanceof HttpErrorResponse
+            && (error.status === 0 || error.status === 408 || error.status === 429 || error.status >= 500)
           ? timer(10000)
           : throwError(() => error),
       }),

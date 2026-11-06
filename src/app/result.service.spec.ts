@@ -41,7 +41,8 @@ describe('ResultService', () => {
   }));
 
   // From review: a backend outage of a minute or more must not fail a job that is still running.
-  for (const [what, error] of [['503s', httpError(503)], ['network errors', httpError(0)]] as const) {
+  const transient = [['503s', httpError(503)], ['network errors', httpError(0)], ['408s', httpError(408)], ['429s', httpError(429)]] as const;
+  for (const [what, error] of transient) {
     it(`keeps polling through ten minutes of ${what}`, fakeAsync(() => {
       const processing = [{ job_id: 'abc', phase: JobStatus.Processing }];
       let calls = 0;
